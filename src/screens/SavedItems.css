@@ -1,0 +1,41 @@
+.saved-items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+.saved-category .section-title {
+  font-size: 24px;
+  font-weight: 300;
+  margin-bottom: 24px;
+}
+
+.saved-grid {
+  display: flex;
+  overflow-x: auto;
+  gap: 32px;
+  padding-bottom: 24px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.saved-grid::-webkit-scrollbar {
+  height: 4px;
+}
+
+.saved-grid::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.saved-grid > * {
+  width: 320px;
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+@media (max-width: 1200px) {
+  .saved-grid > * {
+    width: 280px;
+  }
+}
