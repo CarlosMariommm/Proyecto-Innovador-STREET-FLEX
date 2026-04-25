@@ -6,6 +6,8 @@ import AccountInformation from './screens/web/AccountInformation';
 import SavedItems from './screens/web/SavedItems';
 import OrderHistory from './screens/web/OrderHistory';
 import ProductDetailsScreen from './screens/web/ProductDetailsScreen';
+import CartScreen from './screens/web/CartScreen';
+import ReceiptScreen from './screens/web/ReceiptScreen';
 
 import AdminAuthScreen from './screens/admin/AdminAuthScreen';
 import AdminLayout from './screens/admin/AdminLayout';
@@ -13,6 +15,9 @@ import SuppliersScreen from './screens/admin/SuppliersScreen';
 import InventoryScreen from './screens/admin/InventoryScreen';
 import InventoryDetailsScreen from './screens/admin/InventoryDetailsScreen';
 import AdminAccountScreen from './screens/admin/AdminAccountScreen';
+import DashboardScreen from './screens/admin/DashboardScreen';
+import EmployeesScreen from './screens/admin/EmployeesScreen';
+import DeliveriesScreen from './screens/admin/DeliveriesScreen';
 
 import './index.css';
 
@@ -21,6 +26,8 @@ function App() {
     <Routes>
       <Route path="/" element={<HomeScreen />} />
       <Route path="/product/:id" element={<ProductDetailsScreen />} />
+      <Route path="/cart" element={<CartScreen />} />
+      <Route path="/receipt" element={<ReceiptScreen />} />
       <Route path="/account" element={<AccountLayout />}>
         <Route index element={<Navigate to="information" replace />} />
         <Route path="information" element={<AccountInformation />} />
@@ -32,12 +39,12 @@ function App() {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="suppliers" replace />} />
         <Route path="suppliers" element={<SuppliersScreen />} />
-        <Route path="dashboard" element={<div></div>} />
+        <Route path="dashboard" element={<DashboardScreen />} />
         <Route path="inventory" element={<InventoryScreen />} />
         <Route path="inventory/:id" element={<InventoryDetailsScreen />} />
-        <Route path="employees" element={<div></div>} />
+        <Route path="employees" element={<EmployeesScreen />} />
         <Route path="account" element={<AdminAccountScreen />} />
-        <Route path="deliveries" element={<div></div>} />
+        <Route path="deliveries" element={<DeliveriesScreen />} />
       </Route>
     </Routes>
   );

@@ -26,9 +26,9 @@ const Header = ({ onMenuClick }) => {
           <Link to="/account" aria-label="User account" className="icon-link">
             <User size={24} />
           </Link>
-          <button aria-label="Shopping bag">
+          <Link to="/cart" aria-label="Shopping bag" className="icon-link">
             <ShoppingBag size={24} />
-          </button>
+          </Link>
         </div>
       </div>
       <div className="header-divider">

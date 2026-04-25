@@ -1,0 +1,141 @@
+.receipt-page-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+.receipt-main {
+  flex: 1;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.receipt-title {
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 4px;
+  margin-bottom: 40px;
+  display: inline-block;
+  border-bottom: 1px solid #333333;
+  padding-bottom: 8px;
+  align-self: flex-start;
+}
+
+.receipt-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.receipt-date {
+  font-size: 18px;
+  color: #333333;
+}
+
+.receipt-dash {
+  font-size: 18px;
+  color: #333333;
+}
+
+.receipt-ref-row {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+.receipt-ref {
+  font-size: 16px;
+  color: #333333;
+}
+
+.receipt-total {
+  font-size: 16px;
+  color: #333333;
+}
+
+.receipt-section-title {
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+  color: #333333;
+}
+
+.receipt-field {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.receipt-label {
+  font-size: 12px;
+  color: #666666;
+  letter-spacing: 1px;
+}
+
+.receipt-value-line {
+  font-size: 14px;
+  color: #333333;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #cccccc;
+}
+
+.mt-12 {
+  margin-top: 48px;
+}
+
+.receipt-item {
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.receipt-item-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.receipt-item-name {
+  font-size: 14px;
+  color: #333333;
+}
+
+.receipt-item-price {
+  font-size: 14px;
+  color: #333333;
+}
+
+.receipt-item-size {
+  font-size: 14px;
+  color: #333333;
+}
+
+.receipt-item-qty {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  width: fit-content;
+  padding: 4px 12px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.qty-control {
+  padding: 0 8px;
+  cursor: pointer;
+  color: #333333;
+}
+
+.qty-number {
+  padding: 0 12px;
+  font-size: 14px;
+  color: #333333;
+}

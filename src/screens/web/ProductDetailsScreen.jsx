@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Header from '../../components/web/Header';
 import Sidebar from '../../components/web/Sidebar';
 import ProductGrid from '../../components/web/ProductGrid';
+import TryOnModal from '../../components/web/TryOnModal';
 import { Plus, Minus } from 'lucide-react';
 import './ProductDetailsScreen.css';
 
@@ -9,6 +10,7 @@ const ProductDetailsScreen = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSizingOpen, setIsSizingOpen] = useState(false);
   const [isColorOpen, setIsColorOpen] = useState(false);
+  const [isTryOnOpen, setIsTryOnOpen] = useState(false);
   
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
@@ -24,12 +26,17 @@ const ProductDetailsScreen = () => {
     <div className="product-details-container">
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <Header onMenuClick={() => setIsSidebarOpen(true)} />
+      <TryOnModal 
+        isOpen={isTryOnOpen} 
+        onClose={() => setIsTryOnOpen(false)} 
+        productName="REFEREE POLO GREY"
+      />
       
       <main className="product-details-main">
         <div className="product-details-layout">
           <div className="product-left-col">
             <div className="product-gallery">
-              <button className="try-on-btn">Try on</button>
+              <button className="try-on-btn" onClick={() => setIsTryOnOpen(true)}>Try on</button>
               
               <div className="main-image-container">
                 <img 
