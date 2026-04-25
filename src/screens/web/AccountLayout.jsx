@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
+import Header from '../../components/web/Header';
+import Sidebar from '../../components/web/Sidebar';
 import './AccountLayout.css';
 
 const AccountLayout = () => {

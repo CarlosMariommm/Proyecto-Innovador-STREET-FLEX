@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
-import ProductGrid from '../components/ProductGrid';
+import Header from '../../components/web/Header';
+import Sidebar from '../../components/web/Sidebar';
+import ProductGrid from '../../components/web/ProductGrid';
 import { Plus, Minus } from 'lucide-react';
 import './ProductDetailsScreen.css';
 
@@ -33,16 +33,16 @@ const ProductDetailsScreen = () => {
               
               <div className="main-image-container">
                 <img 
-                  src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop" 
+                  src="/images/product-1.jpg" 
                   alt="Referee Polo Grey" 
                   className="main-image"
                 />
               </div>
               
               <div className="thumbnail-gallery">
-                <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=200&auto=format&fit=crop" alt="Thumb 1" className="thumbnail" />
-                <img src="https://images.unsplash.com/photo-1516826957135-700ede19c6ce?q=80&w=200&auto=format&fit=crop" alt="Thumb 2" className="thumbnail" />
-                <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=200&auto=format&fit=crop" alt="Thumb 3" className="thumbnail" />
+                <img src="/images/thumb-1.jpg" alt="Thumb 1" className="thumbnail" />
+                <img src="/images/thumb-2.jpg" alt="Thumb 2" className="thumbnail" />
+                <img src="/images/thumb-3.jpg" alt="Thumb 3" className="thumbnail" />
               </div>
             </div>
             

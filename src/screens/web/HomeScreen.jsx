@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import Header from '../components/Header';
-import HeroSection from '../components/HeroSection';
-import ProductGrid from '../components/ProductGrid';
-import Sidebar from '../components/Sidebar';
+import Header from '../../components/web/Header';
+import HeroSection from '../../components/web/HeroSection';
+import ProductGrid from '../../components/web/ProductGrid';
+import Sidebar from '../../components/web/Sidebar';
 
 const HomeScreen = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
