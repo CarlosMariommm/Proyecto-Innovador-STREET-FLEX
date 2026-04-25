@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Package, Users, Settings, Truck, Box } from 'lucide-react';
 import './AdminSidebar.css';
 
 const AdminSidebar = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   const navItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Inventory', path: '/admin/inventory', icon: Package },
@@ -14,10 +16,15 @@ const AdminSidebar = () => {
   ];
 
   return (
-    <aside className="admin-sidebar">
+    <aside className={`admin-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="admin-sidebar-header">
-        <h2>STREET FLEX</h2>
-        <span className="collapse-icon">«</span>
+        {!isCollapsed && <h2>STREET FLEX</h2>}
+        <span 
+          className="collapse-icon" 
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          «
+        </span>
       </div>
       
       <nav className="admin-sidebar-nav">
@@ -26,9 +33,10 @@ const AdminSidebar = () => {
             key={item.name} 
             to={item.path}
             className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}
+            title={isCollapsed ? item.name : ''}
           >
             <item.icon size={20} className="admin-nav-icon" />
-            <span className="admin-nav-text">{item.name.toUpperCase()}</span>
+            {!isCollapsed && <span className="admin-nav-text">{item.name.toUpperCase()}</span>}
           </NavLink>
         ))}
       </nav>

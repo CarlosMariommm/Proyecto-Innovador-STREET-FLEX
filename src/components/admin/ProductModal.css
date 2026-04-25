@@ -1,0 +1,39 @@
+.product-modal-content {
+  background-color: #ffffff;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  font-family: var(--font-family, 'JetBrains Mono', monospace);
+}
+
+.border-none {
+  border-bottom: none;
+}
+
+.product-image-upload {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+  justify-content: center;
+}
+
+.upload-box-dashed {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  border: 1px dashed #cccccc;
+}
+
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}

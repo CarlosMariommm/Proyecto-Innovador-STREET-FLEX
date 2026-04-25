@@ -1,7 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AdminAuthScreen.css';
 
 const AdminAuthScreen = () => {
+  const navigate = useNavigate();
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    navigate('/admin/dashboard');
+  };
+
   return (
     <div className="admin-auth-container">
       <div className="admin-auth-left">
@@ -15,11 +23,11 @@ const AdminAuthScreen = () => {
           <h2 className="admin-auth-title">STREET FLEX</h2>
           
           <div className="admin-auth-header">
-            <h3>Create an account</h3>
+            <h3>Sign in</h3>
             <p>Start your 30-day free trial.</p>
           </div>
           
-          <form className="admin-auth-form" onSubmit={(e) => e.preventDefault()}>
+          <form className="admin-auth-form" onSubmit={handleLogin}>
             <div className="form-group">
               <label htmlFor="name">Name*</label>
               <input type="text" id="name" placeholder="Enter your name" />
@@ -36,7 +44,7 @@ const AdminAuthScreen = () => {
               <span className="password-hint">Must be at least 8 characters.</span>
             </div>
             
-            <button type="submit" className="btn-primary">Get started</button>
+            <button type="submit" className="btn-primary">Sign in</button>
             
             <button type="button" className="btn-google">
               <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -51,7 +59,7 @@ const AdminAuthScreen = () => {
           </form>
           
           <p className="admin-auth-footer">
-            Already have an account? <a href="#">Log in</a>
+            Already have an account? <a>Log in</a>
           </p>
         </div>
       </div>

@@ -7,17 +7,18 @@ import SavedItems from './screens/web/SavedItems';
 import OrderHistory from './screens/web/OrderHistory';
 import ProductDetailsScreen from './screens/web/ProductDetailsScreen';
 
-// Admin imports
 import AdminAuthScreen from './screens/admin/AdminAuthScreen';
 import AdminLayout from './screens/admin/AdminLayout';
 import SuppliersScreen from './screens/admin/SuppliersScreen';
+import InventoryScreen from './screens/admin/InventoryScreen';
+import InventoryDetailsScreen from './screens/admin/InventoryDetailsScreen';
+import AdminAccountScreen from './screens/admin/AdminAccountScreen';
 
 import './index.css';
 
 function App() {
   return (
     <Routes>
-      {/* Web Routes */}
       <Route path="/" element={<HomeScreen />} />
       <Route path="/product/:id" element={<ProductDetailsScreen />} />
       <Route path="/account" element={<AccountLayout />}>
@@ -27,16 +28,16 @@ function App() {
         <Route path="orders" element={<OrderHistory />} />
       </Route>
 
-      {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminAuthScreen />} />
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="suppliers" replace />} />
         <Route path="suppliers" element={<SuppliersScreen />} />
-        <Route path="dashboard" element={<div>Dashboard Placeholder</div>} />
-        <Route path="inventory" element={<div>Inventory Placeholder</div>} />
-        <Route path="employees" element={<div>Employees Placeholder</div>} />
-        <Route path="account" element={<div>Account Placeholder</div>} />
-        <Route path="deliveries" element={<div>Deliveries Placeholder</div>} />
+        <Route path="dashboard" element={<div></div>} />
+        <Route path="inventory" element={<InventoryScreen />} />
+        <Route path="inventory/:id" element={<InventoryDetailsScreen />} />
+        <Route path="employees" element={<div></div>} />
+        <Route path="account" element={<AdminAccountScreen />} />
+        <Route path="deliveries" element={<div></div>} />
       </Route>
     </Routes>
   );
