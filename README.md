@@ -1,16 +1,26 @@
-# React + Vite
+# **Street Flex**
+## **Integrantes**
+Carlos Mario Quintanilla Ramírez - 20210212
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Andrés Emanuel Gálvez Alvarenga - 20240230
 
-Currently, two official plugins are available:
+Javier Eliezer Juárez Méndez - 20240291
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Marco Alejandro Mejía Marroquín - 20210318
 
-## React Compiler
+# *Descripción del Proyecto*
+Street Flex es una tienda en línea y marca de ropa enfocada en la moda urbana (streetwear). Nuestro proyecto destaca por ofrecer prendas exclusivas, cómodas y de alta calidad, caracterizadas por una estética moderna donde predominan las paletas de colores grises y tonos neutros. El objetivo es brindar a los usuarios una plataforma dinámica y atractiva para explorar nuestras colecciones, ubicar nuestras tiendas físicas y contactarnos con facilidad.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## *Tecnologías Utilizadas*
+React — Construcción de interfaces dinámicas.
 
-## Expanding the ESLint configuration
+JavaScript (ES6+) — Lógica del cliente.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+HTML5 — Estructura de la aplicación.
+
+CSS3 — Estilos y diseño visual.
+
+## *Herramientas y Control de Versiones*
+Git
+
+GitHub
