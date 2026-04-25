@@ -8,6 +8,7 @@ import OrderHistory from './screens/web/OrderHistory';
 import ProductDetailsScreen from './screens/web/ProductDetailsScreen';
 import CartScreen from './screens/web/CartScreen';
 import ReceiptScreen from './screens/web/ReceiptScreen';
+import TryOnScreen from './screens/web/TryOnScreen';
 
 import AdminAuthScreen from './screens/admin/AdminAuthScreen';
 import AdminLayout from './screens/admin/AdminLayout';
@@ -28,6 +29,7 @@ function App() {
       <Route path="/product/:id" element={<ProductDetailsScreen />} />
       <Route path="/cart" element={<CartScreen />} />
       <Route path="/receipt" element={<ReceiptScreen />} />
+      <Route path="/try-on" element={<TryOnScreen />} />
       <Route path="/account" element={<AccountLayout />}>
         <Route index element={<Navigate to="information" replace />} />
         <Route path="information" element={<AccountInformation />} />

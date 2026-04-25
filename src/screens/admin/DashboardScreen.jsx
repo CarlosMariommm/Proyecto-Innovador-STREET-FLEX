@@ -199,7 +199,7 @@ const DashboardScreen = () => {
           </div>
           <div className="low-stock-list">
             <div className="low-stock-item">
-              <img src="/images/product-1.jpg" alt="Referee Polo Grey" className="low-stock-img" />
+              <img src="/images/product-1.png" alt="Referee Polo Grey" className="low-stock-img" />
               <div className="low-stock-info">
                 <h4>REFEREE POLO GREY</h4>
                 <p>Remaining Quantity : 10 Shirt</p>
@@ -207,7 +207,7 @@ const DashboardScreen = () => {
               <span className="low-badge">Low</span>
             </div>
             <div className="low-stock-item">
-              <img src="/images/coat-1.jpg" alt="Referee Polo Grey" className="low-stock-img" />
+              <img src="/images/coat-1.png" alt="Referee Polo Grey" className="low-stock-img" />
               <div className="low-stock-info">
                 <h4>REFEREE POLO GREY</h4>
                 <p>Remaining Quantity : 15 Shirt</p>
@@ -215,7 +215,7 @@ const DashboardScreen = () => {
               <span className="low-badge">Low</span>
             </div>
             <div className="low-stock-item">
-              <img src="/images/product-2.jpg" alt="Referee Polo Grey" className="low-stock-img" />
+              <img src="/images/product-2.png" alt="Referee Polo Grey" className="low-stock-img" />
               <div className="low-stock-info">
                 <h4>REFEREE POLO GREY</h4>
                 <p>Remaining Quantity : 15 Shirt</p>

@@ -5,14 +5,14 @@ import './SavedItems.css';
 const SAVED_COATS = [
   {
     id: 1,
-    image: '/images/coat-1.jpg',
+    image: '/images/product-1.png',
     description: 'A placeholder text is a block of nonsensical or meaningless text that...',
     title: 'PIECE TITLE',
     price: '875'
   },
   {
     id: 2,
-    image: '/images/coat-2.jpg',
+    image: '/images/product-2.png',
     description: 'A placeholder text is a block of nonsensical or meaningless text that...',
     title: 'PIECE TITLE',
     price: '875'
@@ -22,14 +22,14 @@ const SAVED_COATS = [
 const SAVED_BAGS = [
   {
     id: 3,
-    image: '/images/bag-1.jpg',
+    image: '/images/product-3.png',
     description: 'A placeholder text is a block of nonsensical or meaningless text that...',
     title: 'PIECE TITLE',
     price: '875'
   },
   {
     id: 4,
-    image: '/images/bag-2.jpg',
+    image: '/images/product-4.png',
     description: 'A placeholder text is a block of nonsensical or meaningless text that...',
     title: 'PIECE TITLE',
     price: '875'

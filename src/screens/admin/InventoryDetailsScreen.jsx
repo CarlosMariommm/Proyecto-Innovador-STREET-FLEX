@@ -94,7 +94,7 @@ const InventoryDetailsScreen = () => {
         
         <div className="details-right">
           <div className="product-image-box">
-            <img src="/images/product-1.jpg" alt="Referee Polo Grey" />
+            <img src="/images/product-1.png" alt="Referee Polo Grey" />
           </div>
           
           <div className="stock-summary">

@@ -5,9 +5,9 @@ import Sidebar from '../../components/web/Sidebar';
 import './CartScreen.css';
 
 const MOCK_CART_ITEMS = [
-  { id: 1, name: 'REFEREE POLO GREY', size: 's', price: 80.00, quantity: 3, image: '/images/product-1.jpg' },
-  { id: 2, name: 'REFEREE POLO RED', size: 's', price: 80.00, quantity: 3, image: '/images/product-2.jpg' },
-  { id: 3, name: 'REFEREE POLO BLUE', size: 's', price: 80.00, quantity: 3, image: '/images/product-3.jpg' },
+  { id: 1, name: 'REFEREE POLO GREY', size: 's', price: 80.00, quantity: 3, image: '/images/product-1.png' },
+  { id: 2, name: 'REFEREE POLO RED', size: 's', price: 80.00, quantity: 3, image: '/images/product-2.png' },
+  { id: 3, name: 'REFEREE POLO BLUE', size: 's', price: 80.00, quantity: 3, image: '/images/product-3.png' },
 ];
 
 const CartScreen = () => {

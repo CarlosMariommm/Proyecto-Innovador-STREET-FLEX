@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/web/Header';
 import Sidebar from '../../components/web/Sidebar';
 import ProductGrid from '../../components/web/ProductGrid';
-import TryOnModal from '../../components/web/TryOnModal';
 import { Plus, Minus } from 'lucide-react';
 import './ProductDetailsScreen.css';
 
@@ -10,10 +10,10 @@ const ProductDetailsScreen = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSizingOpen, setIsSizingOpen] = useState(false);
   const [isColorOpen, setIsColorOpen] = useState(false);
-  const [isTryOnOpen, setIsTryOnOpen] = useState(false);
   
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
+  const navigate = useNavigate();
 
   const sizes = ['XS', 'S', 'M', 'L', 'XL'];
   const colors = [
@@ -26,30 +26,25 @@ const ProductDetailsScreen = () => {
     <div className="product-details-container">
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <Header onMenuClick={() => setIsSidebarOpen(true)} />
-      <TryOnModal 
-        isOpen={isTryOnOpen} 
-        onClose={() => setIsTryOnOpen(false)} 
-        productName="REFEREE POLO GREY"
-      />
       
       <main className="product-details-main">
         <div className="product-details-layout">
           <div className="product-left-col">
             <div className="product-gallery">
-              <button className="try-on-btn" onClick={() => setIsTryOnOpen(true)}>Try on</button>
+              <button className="try-on-btn" onClick={() => navigate('/try-on')}>Try on</button>
               
               <div className="main-image-container">
                 <img 
-                  src="/images/product-1.jpg" 
+                  src="/images/product-1.png" 
                   alt="Referee Polo Grey" 
                   className="main-image"
                 />
               </div>
               
               <div className="thumbnail-gallery">
-                <img src="/images/thumb-1.jpg" alt="Thumb 1" className="thumbnail" />
-                <img src="/images/thumb-2.jpg" alt="Thumb 2" className="thumbnail" />
-                <img src="/images/thumb-3.jpg" alt="Thumb 3" className="thumbnail" />
+                <img src="/images/thumb-1.png" alt="Thumb 1" className="thumbnail" />
+                <img src="/images/thumb-2.png" alt="Thumb 2" className="thumbnail" />
+                <img src="/images/thumb-3.png" alt="Thumb 3" className="thumbnail" />
               </div>
             </div>
             

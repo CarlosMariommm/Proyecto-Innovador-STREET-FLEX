@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Search, User, ShoppingBag } from 'lucide-react';
+import { Menu, User, Shirt, ShoppingCart } from 'lucide-react';
 import './Header.css';
 
 const Header = ({ onMenuClick }) => {
@@ -20,14 +20,15 @@ const Header = ({ onMenuClick }) => {
         </div>
 
         <div className="header-right">
-          <button aria-label="Search">
-            <Search size={24} />
-          </button>
           <Link to="/account" aria-label="User account" className="icon-link">
             <User size={24} />
           </Link>
-          <Link to="/cart" aria-label="Shopping bag" className="icon-link">
-            <ShoppingBag size={24} />
+          <Link to="/try-on" aria-label="Try on" className="icon-link">
+            {/* Usamos el icono de una camiseta para simular el Try On/Gancho */}
+            <Shirt size={24} />
+          </Link>
+          <Link to="/cart" aria-label="Shopping cart" className="icon-link">
+            <ShoppingCart size={24} />
           </Link>
         </div>
       </div>

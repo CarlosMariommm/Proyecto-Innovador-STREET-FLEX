@@ -7,7 +7,7 @@ const HeroSection = () => {
       <div className="hero-block">
         <div className="hero-image-container">
           <img 
-            src="/images/new-york.jpg" 
+            src="/images/new-york.png" 
             alt="East Village New York" 
             className="hero-image"
           />
@@ -22,7 +22,7 @@ const HeroSection = () => {
       <div className="hero-block">
         <div className="hero-image-container">
           <img 
-            src="/images/los-angeles.jpg" 
+            src="/images/los-angeles.png" 
             alt="Koreatown Los Angeles" 
             className="hero-image"
           />
