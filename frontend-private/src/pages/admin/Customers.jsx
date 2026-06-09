@@ -15,7 +15,6 @@ const Customers = () => {
   const openModal = (customer = null) => {
     setEditingCustomer(customer);
     if (customer) {
-      // Don't show password field when editing for security
       reset({ name: customer.name, email: customer.email });
     } else {
       reset({ name: '', email: '', password: '' });
@@ -31,10 +30,8 @@ const Customers = () => {
 
   const onSubmit = (data) => {
     if (editingCustomer) {
-      // update
       updateCustomer(editingCustomer.id, { name: data.name, email: data.email });
     } else {
-      // create
       addCustomer(data);
     }
     closeModal();

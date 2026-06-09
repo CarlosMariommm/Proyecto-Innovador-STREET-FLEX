@@ -13,6 +13,7 @@ import Categories from './pages/admin/Categories';
 import Products from './pages/admin/Products';
 import Customers from './pages/admin/Customers';
 import Employees from './pages/admin/Employees';
+import Orders from './pages/admin/Orders';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route path="products" element={<Products />} />
               <Route path="customers" element={<Customers />} />
               <Route path="employees" element={<Employees />} />
+              <Route path="orders" element={<Orders />} />
             </Route>
           </Route>
         </Routes>

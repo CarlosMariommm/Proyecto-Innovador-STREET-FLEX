@@ -6,7 +6,6 @@ const useEmployees = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Empleados se guardarán de forma independiente
     const saved = localStorage.getItem('employees');
     if (saved) {
       setEmployees(JSON.parse(saved));

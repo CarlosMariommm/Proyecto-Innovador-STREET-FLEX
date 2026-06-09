@@ -6,7 +6,6 @@ const useCustomers = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Para clientes compartiremos los mismos que 'users' de auth, pero con role === 'user'
     const loadCustomers = () => {
       const allUsers = JSON.parse(localStorage.getItem('users')) || [];
       const onlyCustomers = allUsers.filter(u => u.role === 'user');
@@ -15,14 +14,12 @@ const useCustomers = () => {
     };
 
     loadCustomers();
-    // Escuchar cambios por si se registra alguien
     window.addEventListener('storage', loadCustomers);
     return () => window.removeEventListener('storage', loadCustomers);
   }, []);
 
   const saveToStorage = (updatedCustomers) => {
     const allUsers = JSON.parse(localStorage.getItem('users')) || [];
-    // Mantener los admin, reemplazar los users con updatedCustomers
     const nonCustomers = allUsers.filter(u => u.role !== 'user');
     const newAllUsers = [...nonCustomers, ...updatedCustomers];
     
