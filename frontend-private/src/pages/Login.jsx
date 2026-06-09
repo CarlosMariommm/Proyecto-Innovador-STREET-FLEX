@@ -49,7 +49,7 @@ const Login = () => {
             <Input
               label="Correo Electrónico"
               type="email"
-              placeholder="admin@antigravity.com"
+              placeholder="admin@gmail.com"
               {...register('email', { 
                 required: 'El correo es obligatorio',
                 pattern: {

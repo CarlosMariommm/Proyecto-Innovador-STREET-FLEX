@@ -4,7 +4,7 @@ export const loginUser = async (email, password) => {
   await delay(800);
   const users = JSON.parse(localStorage.getItem('users')) || [];
   
-  if (email === 'admin@antigravity.com' && password === 'admin123') {
+  if (email === 'admin@gmail.com' && password === 'admin123') {
     return { id: 1, name: 'Admin', email, role: 'admin' };
   }
 
