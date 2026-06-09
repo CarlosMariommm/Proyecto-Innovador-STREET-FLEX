@@ -66,7 +66,7 @@ El proyecto respeta de forma estricta la siguiente estructura de carpetas:
 
 ## Credenciales de Acceso Administrador
 Para probar los módulos privados, inicia sesión con:
-- **Correo**: `admin@antigravity.com`
+- **Correo**: `admin@gmail.com`
 - **Contraseña**: `admin123`
 
 ## Equipo de Desarrollo
