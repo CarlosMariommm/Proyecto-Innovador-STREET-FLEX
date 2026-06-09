@@ -11,6 +11,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminLayout from './components/Layout/AdminLayout';
 import Categories from './pages/admin/Categories';
 import Products from './pages/admin/Products';
+import Customers from './pages/admin/Customers';
+import Employees from './pages/admin/Employees';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
               <Route index element={<AdminDashboard />} />
               <Route path="categories" element={<Categories />} />
               <Route path="products" element={<Products />} />
+              <Route path="customers" element={<Customers />} />
+              <Route path="employees" element={<Employees />} />
             </Route>
           </Route>
         </Routes>
