@@ -1,7 +1,7 @@
 # Proyecto Antigravity - Avance 2
 
 ## Descripción
-Este proyecto corresponde al **Avance 2** del módulo 3.8 del Instituto Técnico Ricaldone. Consiste en el Front-end de una tienda en línea llamada "Antigravity", desarrollada con React.js. Cuenta con una parte pública orientada al registro e inicio de sesión de clientes, y una parte administrativa (privada) con paneles de control y CRUDs 100% operativos.
+Este proyecto corresponde al **Avance 2** del módulo 3.8 del Instituto Técnico Ricaldone. Consiste en el Front-end de una tienda en línea, desarrollada con React.js. Cuenta con una parte pública orientada al registro e inicio de sesión de clientes, y una parte administrativa (privada) con paneles de control y CRUDs 100% operativos.
 
 ## Tecnologías y Herramientas
 - **React.js (Vite)**: Biblioteca principal para la interfaz de usuario.
