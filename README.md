@@ -70,4 +70,7 @@ Para probar los módulos privados, inicia sesión con:
 - **Contraseña**: `admin123`
 
 ## Equipo de Desarrollo
-- Carlos Mario (Front-end Developer)
+- Carlos Mario 
+- Andrés Emanuel
+- Marco Alejandro
+- Javier Eliezer
