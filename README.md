@@ -37,7 +37,7 @@ El proyecto respeta de forma estricta la siguiente estructura de carpetas:
 ## Funcionalidades Implementadas
 1. **Autenticación (Mock LocalStorage)**: 
    - Login y Registro con validaciones.
-   - Protección de rutas: Solo el administrador (`admin@antigravity.com` / `admin123`) puede acceder a `/admin`.
+   - Protección de rutas: Solo el administrador (`admin@gmail.com` / `admin123`) puede acceder a `/admin`.
 2. **Dashboard Administrativo**: Diseño premium con menú lateral para navegar entre módulos sin recargar la página.
 3. **Módulos CRUD Operativos**: 
    - Categorías
