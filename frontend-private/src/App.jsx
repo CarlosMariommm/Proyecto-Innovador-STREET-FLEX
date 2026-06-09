@@ -8,6 +8,9 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminLayout from './components/Layout/AdminLayout';
+import Categories from './pages/admin/Categories';
+import Products from './pages/admin/Products';
 
 function App() {
   return (
@@ -15,15 +18,16 @@ function App() {
       <BrowserRouter>
         <Toaster position="top-right" />
         <Routes>
-          {/* Rutas Públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
-          {/* Rutas Privadas */}
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-            <Route path="/admin" element={<AdminDashboard />} />
-            {/* Aquí irán los CRUDs luego */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="categories" element={<Categories />} />
+              <Route path="products" element={<Products />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>
@@ -31,5 +35,4 @@ function App() {
   );
 }
 
-/* :)**/
 export default App;

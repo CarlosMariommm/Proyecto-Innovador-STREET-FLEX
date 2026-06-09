@@ -10,7 +10,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />; // Redirigir si no tiene permiso
+    return <Navigate to="/" replace />; 
   }
 
   return <Outlet />;
