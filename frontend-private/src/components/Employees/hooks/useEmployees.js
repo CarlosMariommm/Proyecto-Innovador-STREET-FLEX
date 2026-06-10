@@ -1,47 +1,75 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
+// Custom Hook para gestionar Empleados conectado al backend real
 const useEmployees = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const saved = localStorage.getItem('employees');
-    if (saved) {
-      setEmployees(JSON.parse(saved));
-    } else {
-      const initial = [
-        { id: 1, name: 'Carlos Mario', role: 'Vendedor', active: true },
-        { id: 2, name: 'Ana Torres', role: 'Gerente', active: true }
-      ];
-      setEmployees(initial);
-      localStorage.setItem('employees', JSON.stringify(initial));
+  // Función auxiliar para peticiones autenticadas con JSON
+  const apiFetch = async (url, options = {}) => {
+    const res = await fetch(url, { credentials: 'include', ...options });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error en la petición');
+    return data;
+  };
+
+  // Carga inicial: trae todos los empleados del backend
+  const fetchEmployees = async () => {
+    try {
+      setLoading(true);
+      const data = await apiFetch('/api/employees');
+      setEmployees(data);
+    } catch (error) {
+      toast.error(error.message || 'No se pudieron cargar los empleados');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchEmployees();
   }, []);
 
-  const saveToStorage = (data) => {
-    localStorage.setItem('employees', JSON.stringify(data));
-    setEmployees(data);
+  // Crear empleado
+  const addEmployee = async (employee) => {
+    try {
+      await apiFetch('/api/employees', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(employee)
+      });
+      toast.success('Empleado agregado exitosamente');
+      await fetchEmployees();
+    } catch (error) {
+      toast.error(error.message || 'Error al agregar empleado');
+    }
   };
 
-  const addEmployee = (employee) => {
-    const newEmployee = { ...employee, id: Date.now() };
-    const newData = [...employees, newEmployee];
-    saveToStorage(newData);
-    toast.success('Empleado agregado exitosamente');
+  // Actualizar empleado
+  const updateEmployee = async (id, updatedData) => {
+    try {
+      await apiFetch(`/api/employees/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      });
+      toast.success('Empleado actualizado exitosamente');
+      await fetchEmployees();
+    } catch (error) {
+      toast.error(error.message || 'Error al actualizar empleado');
+    }
   };
 
-  const updateEmployee = (id, updatedData) => {
-    const newData = employees.map(emp => (emp.id === id ? { ...emp, ...updatedData } : emp));
-    saveToStorage(newData);
-    toast.success('Empleado actualizado exitosamente');
-  };
-
-  const deleteEmployee = (id) => {
-    const newData = employees.filter(emp => emp.id !== id);
-    saveToStorage(newData);
-    toast.success('Empleado eliminado exitosamente');
+  // Eliminar empleado
+  const deleteEmployee = async (id) => {
+    try {
+      await apiFetch(`/api/employees/${id}`, { method: 'DELETE' });
+      toast.success('Empleado eliminado exitosamente');
+      await fetchEmployees();
+    } catch (error) {
+      toast.error(error.message || 'Error al eliminar empleado');
+    }
   };
 
   return {
@@ -49,7 +77,8 @@ const useEmployees = () => {
     loading,
     addEmployee,
     updateEmployee,
-    deleteEmployee
+    deleteEmployee,
+    refetch: fetchEmployees
   };
 };
 

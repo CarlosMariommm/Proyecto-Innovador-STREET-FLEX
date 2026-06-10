@@ -9,7 +9,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-white">
       <nav className="p-4 flex justify-between items-center shadow-md">
-        <h1 className="text-2xl font-bold text-gray-900">Antigravity</h1>
+        <h1 className="text-2xl font-bold text-gray-900">StreetFlex</h1>
         <div>
           {user ? (
             <div className="flex items-center gap-4">
@@ -27,10 +27,10 @@ const Home = () => {
           )}
         </div>
       </nav>
-      
+
       <main className="max-w-7xl mx-auto py-16 px-4 text-center">
         <h2 className="text-5xl font-extrabold text-gray-900 mb-6">
-          Bienvenido a Antigravity
+          Bienvenido a StreetFlex
         </h2>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
           La mejor tienda en línea. Regístrate para comenzar a comprar o ingresa como administrador para gestionar el sistema.

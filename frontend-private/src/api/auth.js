@@ -1,40 +1,45 @@
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export const loginUser = async (email, password) => {
-  await delay(800);
-  const users = JSON.parse(localStorage.getItem('users')) || [];
-  
-  if (email === 'admin@gmail.com' && password === 'admin123') {
-    return { id: 1, name: 'Admin', email, role: 'admin' };
-  }
-
-  const user = users.find(u => u.email === email && u.password === password);
-  
-  if (user) {
-    const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
-  }
-  
-  throw new Error('Credenciales inválidas');
+    const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+        throw new Error(data.message || 'Credenciales inválidas');
+    }
+    
+    return data;
 };
 
 export const registerUser = async (userData) => {
-  await delay(800);
-  const users = JSON.parse(localStorage.getItem('users')) || [];
-  
-  if (users.find(u => u.email === userData.email)) {
-    throw new Error('El correo ya está registrado');
-  }
+    const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+        throw new Error(data.message || 'Error en registro');
+    }
+    
+    return data;
+};
 
-  const newUser = {
-    id: Date.now(),
-    ...userData,
-    role: 'user'
-  };
-
-  users.push(newUser);
-  localStorage.setItem('users', JSON.stringify(users));
-  
-  const { password, ...userWithoutPassword } = newUser;
-  return userWithoutPassword;
+export const logoutUser = async () => {
+    const res = await fetch('/api/auth/logout', {
+        method: 'POST'
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+        throw new Error(data.message || 'Error al cerrar sesión');
+    }
+    
+    return data;
 };

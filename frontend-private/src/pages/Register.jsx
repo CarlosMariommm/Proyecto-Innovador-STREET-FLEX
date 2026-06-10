@@ -40,10 +40,10 @@ const Register = () => {
             Crear Cuenta
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Únete a la tienda Antigravity
+            Únete a la tienda StreetFlex
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <Input
             label="Nombre Completo"
@@ -56,7 +56,7 @@ const Register = () => {
             label="Correo Electrónico"
             type="email"
             placeholder="tucorreo@ejemplo.com"
-            {...register('email', { 
+            {...register('email', {
               required: 'El correo es obligatorio',
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -65,12 +65,12 @@ const Register = () => {
             })}
             error={errors.email?.message}
           />
-          
+
           <Input
             label="Contraseña"
             type="password"
             placeholder="••••••••"
-            {...register('password', { 
+            {...register('password', {
               required: 'La contraseña es obligatoria',
               minLength: {
                 value: 6,
@@ -84,14 +84,14 @@ const Register = () => {
             label="Confirmar Contraseña"
             type="password"
             placeholder="••••••••"
-            {...register('confirmPassword', { 
+            {...register('confirmPassword', {
               validate: value => value === password || 'Las contraseñas no coinciden'
             })}
             error={errors.confirmPassword?.message}
           />
 
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             variant="primary"
             className="w-full py-3 mt-6 bg-green-600 hover:bg-green-700"
             disabled={isSubmitting}

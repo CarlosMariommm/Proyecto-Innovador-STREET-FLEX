@@ -17,8 +17,8 @@ const Login = () => {
     try {
       const user = await loginUser(data.email, data.password);
       login(user);
-      toast.success(`Bienvenido, ${user.name}`);
-      
+      toast.success(`Bienvenido, ${user.firstName || user.name}`);
+
       if (user.role === 'admin') {
         navigate('/admin');
       } else {
@@ -40,17 +40,17 @@ const Login = () => {
             Iniciar Sesión
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Antigravity Admin & Tienda
+            StreetFlex Admin & Tienda
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
             <Input
               label="Correo Electrónico"
               type="email"
               placeholder="admin@gmail.com"
-              {...register('email', { 
+              {...register('email', {
                 required: 'El correo es obligatorio',
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -59,12 +59,12 @@ const Login = () => {
               })}
               error={errors.email?.message}
             />
-            
+
             <Input
               label="Contraseña"
               type="password"
               placeholder="••••••••"
-              {...register('password', { 
+              {...register('password', {
                 required: 'La contraseña es obligatoria',
                 minLength: {
                   value: 6,
@@ -75,8 +75,8 @@ const Login = () => {
             />
           </div>
 
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full flex justify-center py-3"
             disabled={isSubmitting}
           >

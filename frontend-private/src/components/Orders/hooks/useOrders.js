@@ -1,46 +1,75 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
+// Custom Hook para gestionar Pedidos conectado al backend real
 const useOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const saved = localStorage.getItem('orders');
-    if (saved) {
-      setOrders(JSON.parse(saved));
-    } else {
-      const initial = [
-        { id: 1, customerName: 'Cliente Ejemplo', total: 145.50, status: 'Pendiente', date: new Date().toISOString() }
-      ];
-      setOrders(initial);
-      localStorage.setItem('orders', JSON.stringify(initial));
+  // Función auxiliar para peticiones autenticadas con JSON
+  const apiFetch = async (url, options = {}) => {
+    const res = await fetch(url, { credentials: 'include', ...options });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error en la petición');
+    return data;
+  };
+
+  // Carga inicial: trae todos los pedidos del backend
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const data = await apiFetch('/api/orders');
+      setOrders(data);
+    } catch (error) {
+      toast.error(error.message || 'No se pudieron cargar los pedidos');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchOrders();
   }, []);
 
-  const saveToStorage = (data) => {
-    localStorage.setItem('orders', JSON.stringify(data));
-    setOrders(data);
+  // Crear pedido
+  const addOrder = async (order) => {
+    try {
+      await apiFetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order)
+      });
+      toast.success('Pedido creado exitosamente');
+      await fetchOrders();
+    } catch (error) {
+      toast.error(error.message || 'Error al crear pedido');
+    }
   };
 
-  const addOrder = (order) => {
-    const newOrder = { ...order, id: Date.now(), date: new Date().toISOString() };
-    const newData = [...orders, newOrder];
-    saveToStorage(newData);
-    toast.success('Pedido agregado exitosamente');
+  // Actualizar estado del pedido (Pendiente, Procesando, Enviado, Entregado, Cancelado)
+  const updateOrder = async (id, updatedData) => {
+    try {
+      await apiFetch(`/api/orders/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      });
+      toast.success('Pedido actualizado exitosamente');
+      await fetchOrders();
+    } catch (error) {
+      toast.error(error.message || 'Error al actualizar pedido');
+    }
   };
 
-  const updateOrder = (id, updatedData) => {
-    const newData = orders.map(ord => (ord.id === id ? { ...ord, ...updatedData } : ord));
-    saveToStorage(newData);
-    toast.success('Pedido actualizado exitosamente');
-  };
-
-  const deleteOrder = (id) => {
-    const newData = orders.filter(ord => ord.id !== id);
-    saveToStorage(newData);
-    toast.success('Pedido eliminado exitosamente');
+  // Eliminar pedido
+  const deleteOrder = async (id) => {
+    try {
+      await apiFetch(`/api/orders/${id}`, { method: 'DELETE' });
+      toast.success('Pedido eliminado exitosamente');
+      await fetchOrders();
+    } catch (error) {
+      toast.error(error.message || 'Error al eliminar pedido');
+    }
   };
 
   return {
@@ -48,7 +77,8 @@ const useOrders = () => {
     loading,
     addOrder,
     updateOrder,
-    deleteOrder
+    deleteOrder,
+    refetch: fetchOrders
   };
 };
 

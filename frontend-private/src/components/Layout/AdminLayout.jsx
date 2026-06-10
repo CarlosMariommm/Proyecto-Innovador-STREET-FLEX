@@ -26,10 +26,10 @@ const AdminLayout = () => {
     <div className="flex h-screen bg-gray-100">
       <aside className="w-64 bg-gray-900 text-white flex flex-col">
         <div className="p-6 border-b border-gray-800">
-          <h2 className="text-2xl font-bold text-white">Antigravity</h2>
+          <h2 className="text-2xl font-bold text-white">StreetFlex</h2>
           <p className="text-sm text-gray-400 mt-1">Admin Panel</p>
         </div>
-        
+
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -38,11 +38,10 @@ const AdminLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive 
-                    ? 'bg-blue-600 text-white' 
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
+                    ? 'bg-blue-600 text-white'
                     : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                }`}
+                  }`}
               >
                 <Icon className="w-5 h-5" />
                 <span className="font-medium">{item.name}</span>
@@ -52,7 +51,7 @@ const AdminLayout = () => {
         </nav>
 
         <div className="p-4 border-t border-gray-800">
-          <button 
+          <button
             onClick={handleLogout}
             className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-gray-800 hover:text-red-300 rounded-lg transition-colors"
           >

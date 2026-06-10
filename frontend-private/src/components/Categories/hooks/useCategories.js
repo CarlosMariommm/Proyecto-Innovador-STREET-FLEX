@@ -1,47 +1,75 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
+// Custom Hook para gestionar Categorías conectado al backend real
 const useCategories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const saved = localStorage.getItem('categories');
-    if (saved) {
-      setCategories(JSON.parse(saved));
-    } else {
-      const initial = [
-        { id: 1, name: 'Sneakers', description: 'Calzado deportivo urbano', active: true },
-        { id: 2, name: 'T-Shirts', description: 'Camisetas de algodón', active: true }
-      ];
-      setCategories(initial);
-      localStorage.setItem('categories', JSON.stringify(initial));
+  // Función auxiliar para hacer peticiones autenticadas (las cookies se envían automáticamente)
+  const apiFetch = async (url, options = {}) => {
+    const res = await fetch(url, { credentials: 'include', ...options });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error en la petición');
+    return data;
+  };
+
+  // Carga inicial: trae todas las categorías del backend
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const data = await apiFetch('/api/categories');
+      setCategories(data);
+    } catch (error) {
+      toast.error(error.message || 'No se pudieron cargar las categorías');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchCategories();
   }, []);
 
-  const saveToStorage = (data) => {
-    localStorage.setItem('categories', JSON.stringify(data));
-    setCategories(data);
+  // Crear categoría: envía los datos al backend y recarga la lista
+  const addCategory = async (category) => {
+    try {
+      await apiFetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(category)
+      });
+      toast.success('Categoría agregada exitosamente');
+      await fetchCategories();
+    } catch (error) {
+      toast.error(error.message || 'Error al agregar categoría');
+    }
   };
 
-  const addCategory = (category) => {
-    const newCategory = { ...category, id: Date.now() };
-    const newData = [...categories, newCategory];
-    saveToStorage(newData);
-    toast.success('Categoría agregada exitosamente');
+  // Actualizar categoría: envía los cambios y recarga
+  const updateCategory = async (id, updatedData) => {
+    try {
+      await apiFetch(`/api/categories/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      });
+      toast.success('Categoría actualizada exitosamente');
+      await fetchCategories();
+    } catch (error) {
+      toast.error(error.message || 'Error al actualizar categoría');
+    }
   };
 
-  const updateCategory = (id, updatedData) => {
-    const newData = categories.map(cat => (cat.id === id ? { ...cat, ...updatedData } : cat));
-    saveToStorage(newData);
-    toast.success('Categoría actualizada exitosamente');
-  };
-
-  const deleteCategory = (id) => {
-    const newData = categories.filter(cat => cat.id !== id);
-    saveToStorage(newData);
-    toast.success('Categoría eliminada exitosamente');
+  // Eliminar categoría: manda DELETE y recarga
+  const deleteCategory = async (id) => {
+    try {
+      await apiFetch(`/api/categories/${id}`, { method: 'DELETE' });
+      toast.success('Categoría eliminada exitosamente');
+      await fetchCategories();
+    } catch (error) {
+      toast.error(error.message || 'Error al eliminar categoría');
+    }
   };
 
   return {
@@ -49,7 +77,8 @@ const useCategories = () => {
     loading,
     addCategory,
     updateCategory,
-    deleteCategory
+    deleteCategory,
+    refetch: fetchCategories
   };
 };
 
