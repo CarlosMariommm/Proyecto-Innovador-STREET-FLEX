@@ -1,0 +1,82 @@
+.admin-layout-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f9f9f9;
+  font-family: var(--font-family, 'JetBrains Mono', monospace);
+}
+
+.admin-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.admin-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #f5f5f5;
+  padding: 8px 16px;
+  border-radius: 4px;
+  width: 400px;
+}
+
+.admin-search input {
+  border: none;
+  background: transparent;
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.admin-search svg {
+  color: #999999;
+}
+
+.admin-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333333;
+}
+
+.user-role {
+  font-size: 12px;
+  color: #999999;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #000000;
+}
+
+.admin-page-content {
+  padding: 32px;
+  flex: 1;
+  overflow-y: auto;
+}
