@@ -1,0 +1,40 @@
+:root {
+  --primary-color: #000000;
+  --bg-color: #FFFFFF;
+  --font-family: 'JetBrains Mono', monospace;
+  --gap-small: 6px;
+  --gap-medium: 24px;
+  --gap-large: 32px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--primary-color);
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  color: inherit;
+}
+
+.container {
+  width: 100%;
+  max-width: 1728px;
+  margin: 0 auto;
+}
