@@ -12,6 +12,8 @@ import inventoryRoutes from './src/routes/inventoryRoutes.js';
 import shoppingCarRoutes from './src/routes/shoppingCarRoutes.js';
 import saleRoutes from './src/routes/saleRoutes.js';
 import aiTryOnRoutes from './src/routes/aiTryOnRoutes.js';
+import dns from 'node:dns'; // o const dns = require('node:dns'); si usas CommonJS
+dns.setDefaultResultOrder('ipv4first');
 
 dotenv.config();
 const app = express();
