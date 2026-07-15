@@ -1,6 +1,6 @@
 import express from 'express';
 import bannerController from '../controllers/bannerController.js';
-import upload from '../middlewares/upload.js'; // Cloudinary upload
+import upload from '../middlewares/uploadMiddleware.js'; // Cloudinary upload
 
 const router = express.Router();
 
