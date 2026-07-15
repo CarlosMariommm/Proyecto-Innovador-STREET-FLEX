@@ -1,11 +1,12 @@
+/* ─── Product Grid Section ─── */
 .product-grid-section {
-  padding: 64px 40px;
+  padding: 48px 40px;
 }
 
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--gap-large); 
+  gap: 64px 20px;
 }
 
 @media (max-width: 1200px) {
@@ -22,15 +23,16 @@
 
 @media (max-width: 600px) {
   .product-grid-section {
-    padding: 32px 20px;
+    padding: 24px 16px;
   }
-  
+
   .product-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px 12px;
   }
 }
 
-/* New Module/Category Navigation Styles */
+/* ─── Module/Category Navigation ─── */
 .module-header-bar {
   margin-bottom: 2rem;
   text-align: center;

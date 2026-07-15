@@ -41,4 +41,43 @@ supplierController.getSuppliers = async (req, res) => {
   }
 };
 
+supplierController.updateSupplier = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { supp_name, email, phone_number, direction, active } = req.body;
+    
+    let updateData = { supp_name, email, phone_number, direction, active };
+    
+    if (req.file && req.file.path) {
+      updateData.image = req.file.path;
+    }
+
+    const supplier = await Supplier.findByIdAndUpdate(id, updateData, { new: true });
+    
+    if (supplier) {
+      res.json({ message: "Action done", data: supplier });
+    } else {
+      res.status(404).json({ message: "Supplier not found" });
+    }
+  } catch (error) {
+    console.log("error" + error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+supplierController.deleteSupplier = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const supplier = await Supplier.findByIdAndDelete(id);
+    if (supplier) {
+      res.json({ message: "Action done" });
+    } else {
+      res.status(404).json({ message: "Supplier not found" });
+    }
+  } catch (error) {
+    console.log("error" + error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export default supplierController;

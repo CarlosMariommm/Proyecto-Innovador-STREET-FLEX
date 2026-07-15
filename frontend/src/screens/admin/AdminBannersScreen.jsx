@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { bannerService } from '../../api/bannerService';
 import { moduleService } from '../../api/moduleService';
 import { useToast } from '../../hooks/useToast';
-import { Trash2, Image as ImageIcon } from 'lucide-react';
+import { Trash2, Edit2, Image as ImageIcon } from 'lucide-react';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
 import './AdminBannersScreen.css';
 
@@ -14,6 +14,7 @@ const AdminBannersScreen = () => {
   const { showToast } = useToast();
   
   const [formData, setFormData] = useState({ id_module: '', active: true });
+  const [editingId, setEditingId] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const fileInputRef = useRef(null);
@@ -53,8 +54,12 @@ const AdminBannersScreen = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.id_module || !imageFile) {
-      showToast("Module and image are required", "error");
+    if (!formData.id_module) {
+      showToast("Module is required", "error");
+      return;
+    }
+    if (!editingId && !imageFile) {
+      showToast("Image is required when creating", "error");
       return;
     }
 
@@ -63,15 +68,23 @@ const AdminBannersScreen = () => {
       const data = new FormData();
       data.append('id_module', formData.id_module);
       data.append('active', formData.active);
-      data.append('image', imageFile);
+      if (imageFile) {
+        data.append('image', imageFile);
+      }
 
-      await bannerService.createBanner(data);
-      showToast("Banner created successfully", "success");
+      if (editingId) {
+        await bannerService.updateBanner(editingId, data);
+        showToast("Banner updated successfully", "success");
+      } else {
+        await bannerService.createBanner(data);
+        showToast("Banner created successfully", "success");
+      }
       
       // Reset form
       setFormData({ id_module: '', active: true });
       setImageFile(null);
       setImagePreview('');
+      setEditingId(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       
       fetchData();
@@ -81,6 +94,20 @@ const AdminBannersScreen = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleEditClick = (banner) => {
+    setFormData({ id_module: banner.id_module?._id || banner.id_module, active: banner.active });
+    setImagePreview(banner.image || '');
+    setImageFile(null);
+    setEditingId(banner._id);
+  };
+
+  const cancelEdit = () => {
+    setFormData({ id_module: '', active: true });
+    setImagePreview('');
+    setImageFile(null);
+    setEditingId(null);
   };
 
   const handleDeleteClick = (id) => {
@@ -112,7 +139,7 @@ const AdminBannersScreen = () => {
 
       <div className="modules-layout">
         <div className="modules-form-card">
-          <h2>Add New Banner</h2>
+          <h2>{editingId ? 'Edit Banner' : 'Add New Banner'}</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Select Module (Link to)*</label>
@@ -130,7 +157,7 @@ const AdminBannersScreen = () => {
             </div>
 
             <div className="form-group">
-              <label>Banner Image*</label>
+              <label>Banner Image {editingId ? '(Optional, leave blank to keep current)' : '*'}</label>
               <input 
                 type="file" 
                 accept="image/*"
@@ -152,6 +179,9 @@ const AdminBannersScreen = () => {
                   </div>
                 )}
               </div>
+              <p style={{ fontSize: '12px', color: 'var(--accent-color)', marginTop: '8px', opacity: 0.7 }}>
+                📐 Dimensiones recomendadas: <strong>1920 × 600 px</strong> (proporción 16:5). La imagen se mostrará completa en el banner.
+              </p>
             </div>
 
             <div className="form-group checkbox-group">
@@ -165,9 +195,16 @@ const AdminBannersScreen = () => {
               </label>
             </div>
 
-            <button type="submit" className="btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Uploading...' : 'Create Banner'}
-            </button>
+            <div style={{display: 'flex', gap: '10px'}}>
+              <button type="submit" className="btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : (editingId ? 'Save Changes' : 'Create Banner')}
+              </button>
+              {editingId && (
+                <button type="button" className="btn-secondary" onClick={cancelEdit} disabled={isSubmitting}>
+                  Cancel
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
@@ -187,13 +224,22 @@ const AdminBannersScreen = () => {
                     <span className={`status-badge ${banner.active ? 'active' : 'inactive'}`}>
                       {banner.active ? 'Active' : 'Inactive'}
                     </span>
-                    <button 
-                      className="btn-icon delete" 
-                      onClick={() => handleDeleteClick(banner._id)}
-                      title="Delete Banner"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    <div style={{display: 'flex', gap: '8px', marginTop: '10px'}}>
+                      <button 
+                        className="btn-icon edit" 
+                        onClick={() => handleEditClick(banner)}
+                        title="Edit Banner"
+                      >
+                        <Edit2 size={18} />
+                      </button>
+                      <button 
+                        className="btn-icon delete" 
+                        onClick={() => handleDeleteClick(banner._id)}
+                        title="Delete Banner"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

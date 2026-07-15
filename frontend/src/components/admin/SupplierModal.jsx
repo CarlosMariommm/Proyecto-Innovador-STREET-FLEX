@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { User, X } from 'lucide-react';
 import { supplierService } from '../../api/supplierService';
 import './SupplierModal.css';
 
-const SupplierModal = ({ isOpen, onClose, onSupplierAdded }) => {
+const SupplierModal = ({ isOpen, onClose, onSupplierAdded, initialData = null }) => {
   const [formData, setFormData] = useState({
     supp_name: '',
     email: '',
@@ -16,6 +16,28 @@ const SupplierModal = ({ isOpen, onClose, onSupplierAdded }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialData) {
+        setFormData({
+          supp_name: initialData.supp_name || '',
+          email: initialData.email || '',
+          phone_number: initialData.phone_number || '',
+          direction: initialData.direction || '',
+          active: initialData.active !== undefined ? initialData.active : true
+        });
+        setImagePreview(initialData.image || null);
+      } else {
+        setFormData({
+          supp_name: '', email: '', phone_number: '', direction: '', active: true
+        });
+        setImagePreview(null);
+      }
+      setImageFile(null);
+      setError(null);
+    }
+  }, [isOpen, initialData]);
 
   if (!isOpen) return null;
 
@@ -57,7 +79,11 @@ const SupplierModal = ({ isOpen, onClose, onSupplierAdded }) => {
         data.append('image', imageFile);
       }
 
-      await supplierService.createSupplier(data);
+      if (initialData && initialData._id) {
+        await supplierService.updateSupplier(initialData._id, data);
+      } else {
+        await supplierService.createSupplier(data);
+      }
       
       setFormData({
         supp_name: '',
@@ -83,7 +109,7 @@ const SupplierModal = ({ isOpen, onClose, onSupplierAdded }) => {
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h3>New Supplier</h3>
+          <h3>{initialData ? 'Edit Supplier' : 'New Supplier'}</h3>
           <button className="close-modal-btn" onClick={onClose} disabled={loading}>
             <X size={20} />
           </button>
@@ -185,7 +211,7 @@ const SupplierModal = ({ isOpen, onClose, onSupplierAdded }) => {
             <div className="modal-actions">
               <button type="button" className="discard-btn" onClick={onClose} disabled={loading}>Discard</button>
               <button type="submit" className="add-supplier-btn" disabled={loading}>
-                {loading ? 'Saving...' : 'Add Supplier'}
+                {loading ? 'Saving...' : (initialData ? 'Save Changes' : 'Add Supplier')}
               </button>
             </div>
           </form>

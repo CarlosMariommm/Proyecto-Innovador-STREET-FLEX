@@ -5,7 +5,7 @@ import { categoryService } from '../../api/categoryService';
 import { moduleService } from '../../api/moduleService';
 import './SupplierModal.css'; // Reuse same modal styles
 
-const ProductModal = ({ isOpen, onClose, onProductAdded }) => {
+const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) => {
   const [formData, setFormData] = useState({
     product_name: '',
     price: '',
@@ -41,8 +41,33 @@ const ProductModal = ({ isOpen, onClose, onProductAdded }) => {
           setModules(list);
         })
         .catch(err => console.error('Error fetching modules:', err));
+
+      if (initialData) {
+        setFormData({
+          product_name: initialData.product_name || '',
+          price: initialData.price || '',
+          id_module: initialData.id_module?._id || initialData.id_module || '',
+          category: initialData.category?._id || initialData.category || '',
+          stock: initialData.stock || '',
+          units: initialData.units || '',
+          seson: initialData.seson || '',
+          material: initialData.material || '',
+          care_instructions: initialData.care_instructions || '',
+          shipping_returns: initialData.shipping_returns || ''
+        });
+        if (initialData.image) {
+          setImagePreview(initialData.image);
+        }
+      } else {
+        setFormData({
+          product_name: '', price: '', id_module: '', category: '', stock: '',
+          units: '', seson: '', material: '', care_instructions: '', shipping_returns: ''
+        });
+        setImagePreview(null);
+        setImageFile(null);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, initialData]);
 
   if (!isOpen) return null;
 
@@ -72,7 +97,11 @@ const ProductModal = ({ isOpen, onClose, onProductAdded }) => {
       });
       if (imageFile) data.append('image', imageFile);
 
-      await productService.createProduct(data);
+      if (initialData && initialData._id) {
+        await productService.updateProduct(initialData._id, data);
+      } else {
+        await productService.createProduct(data);
+      }
 
       setFormData({
         product_name: '', price: '', id_module: '', category: '', stock: '',
@@ -95,7 +124,7 @@ const ProductModal = ({ isOpen, onClose, onProductAdded }) => {
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h3>New Product</h3>
+          <h3>{initialData ? 'Edit Product' : 'New Product'}</h3>
           <button className="close-modal-btn" onClick={onClose} disabled={loading}>
             <X size={20} />
           </button>
@@ -205,8 +234,7 @@ const ProductModal = ({ isOpen, onClose, onProductAdded }) => {
             <div className="modal-actions">
               <button type="button" className="discard-btn" onClick={onClose} disabled={loading}>Discard</button>
               <button type="submit" className="add-supplier-btn" disabled={loading}>
-                {loading ? 'Saving...' : 'Add Product'}
-              </button>
+                {loading ? 'Saving...' : (initialData ? 'Save Changes' : 'Add Product')}              </button>
             </div>
           </form>
         </div>

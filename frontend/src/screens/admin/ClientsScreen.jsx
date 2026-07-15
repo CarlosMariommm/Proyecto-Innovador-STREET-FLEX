@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { clientService } from '../../api/clientService';
 import { useToast } from '../../hooks/useToast';
-import { Trash2, User } from 'lucide-react';
+import { Trash2, User, Edit2 } from 'lucide-react';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
+import ClientModal from '../../components/admin/ClientModal';
 import './ClientsScreen.css';
 
 const ClientsScreen = () => {
@@ -15,6 +16,8 @@ const ClientsScreen = () => {
   const [filterVerified, setFilterVerified] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, clientId: null, clientName: '' });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState(null);
 
   const fetchClients = async () => {
     try {
@@ -52,6 +55,16 @@ const ClientsScreen = () => {
 
   const handleDeleteClick = (id, name) => {
     setConfirmDialog({ isOpen: true, clientId: id, clientName: name });
+  };
+
+  const handleEditClick = (client) => {
+    setSelectedClient(client);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedClient(null);
   };
 
   const handleConfirmDelete = async () => {
@@ -166,13 +179,23 @@ const ClientsScreen = () => {
                   </td>
                   <td>{formatDate(client.createdAt)}</td>
                   <td>
-                    <button
-                      className="btn-delete-client"
-                      onClick={() => handleDeleteClick(client._id, client.full_name || client.email)}
-                      title="Delete client"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div style={{display: 'flex', gap: '8px'}}>
+                      <button
+                        className="btn-icon edit"
+                        onClick={() => handleEditClick(client)}
+                        title="Edit client status"
+                        style={{background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary-color)'}}
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                      <button
+                        className="btn-delete-client"
+                        onClick={() => handleDeleteClick(client._id, client.full_name || client.email)}
+                        title="Delete client"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -190,6 +213,13 @@ const ClientsScreen = () => {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         danger={true}
+      />
+
+      <ClientModal 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onClientUpdated={fetchClients}
+        initialData={selectedClient}
       />
     </div>
   );

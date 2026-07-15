@@ -9,7 +9,9 @@ router.route('/')
   .get(productController.getProducts);
 
 router.route('/:id')
-  .get(productController.getProductById);
+  .get(productController.getProductById)
+  .put(upload.single('image'), productController.updateProduct)
+  .delete(productController.deleteProduct);
 
 router.route('/:id/reviews')
   .post(productController.addReview);

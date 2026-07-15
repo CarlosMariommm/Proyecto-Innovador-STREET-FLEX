@@ -1,5 +1,6 @@
 import Sale from '../models/saleModel.js';
 import Shopping_Car from '../models/shoppingCarModel.js';
+import Product from '../models/productModel.js';
 
 const saleController = {};
 
@@ -12,6 +13,19 @@ saleController.createSale = async (req, res) => {
     });
 
     if (sale) {
+      // Disminuir stock de los productos comprados
+      const shoppingCar = await Shopping_Car.findById(id_shoppig_car);
+      if (shoppingCar && shoppingCar.products) {
+        for (const item of shoppingCar.products) {
+          if (item.id_product && item.amount) {
+            await Product.findByIdAndUpdate(
+              item.id_product,
+              { $inc: { stock: -item.amount } }
+            );
+          }
+        }
+      }
+
       res.json({ message: "Action done", data: sale });
     } else {
       res.status(400).json({ message: "Invalid data" });

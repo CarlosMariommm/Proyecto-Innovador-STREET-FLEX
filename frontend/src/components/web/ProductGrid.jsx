@@ -115,9 +115,9 @@ const ProductGrid = () => {
               key={product._id}
               id={product._id}
               image={product.image || '/images/product-1.png'}
-              description={product.description || 'No description available'}
-              title={product.name}
+              title={product.product_name || product.name}
               price={product.price}
+              category={product.category?.name || ''}
             />
           ))
         )}

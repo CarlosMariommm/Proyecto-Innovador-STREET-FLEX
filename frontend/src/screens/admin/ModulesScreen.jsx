@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { moduleService } from '../../api/moduleService';
 import { useToast } from '../../hooks/useToast';
-import { Trash2, Image as ImageIcon } from 'lucide-react';
+import { Trash2, Edit2, Image as ImageIcon } from 'lucide-react';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
 import './ModulesScreen.css';
 
@@ -12,6 +12,7 @@ const ModulesScreen = () => {
   const { showToast } = useToast();
   
   const [formData, setFormData] = useState({ name: '', active: true });
+  const [editingId, setEditingId] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, id: null });
 
   useEffect(() => {
@@ -41,11 +42,17 @@ const ModulesScreen = () => {
 
     try {
       setIsSubmitting(true);
-      await moduleService.createModule(formData);
-      showToast("Module created successfully", "success");
+      if (editingId) {
+        await moduleService.updateModule(editingId, formData);
+        showToast("Module updated successfully", "success");
+      } else {
+        await moduleService.createModule(formData);
+        showToast("Module created successfully", "success");
+      }
       
       // Reset form
       setFormData({ name: '', active: true });
+      setEditingId(null);
       fetchModules();
     } catch (error) {
       console.error(error);
@@ -53,6 +60,16 @@ const ModulesScreen = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleEditClick = (module) => {
+    setFormData({ name: module.name, active: module.active });
+    setEditingId(module._id);
+  };
+
+  const cancelEdit = () => {
+    setFormData({ name: '', active: true });
+    setEditingId(null);
   };
 
   const handleDeleteClick = (id) => {
@@ -84,7 +101,7 @@ const ModulesScreen = () => {
 
       <div className="modules-layout">
         <div className="modules-form-card">
-          <h2>Add New Module</h2>
+          <h2>{editingId ? 'Edit Module' : 'Add New Module'}</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Module Name (e.g. Hombres, Verano)*</label>
@@ -107,9 +124,16 @@ const ModulesScreen = () => {
               </label>
             </div>
 
-            <button type="submit" className="btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Uploading...' : 'Create Module'}
-            </button>
+            <div style={{display: 'flex', gap: '10px'}}>
+              <button type="submit" className="btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : (editingId ? 'Save Changes' : 'Create Module')}
+              </button>
+              {editingId && (
+                <button type="button" className="btn-secondary" onClick={cancelEdit} disabled={isSubmitting}>
+                  Cancel
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
@@ -126,13 +150,22 @@ const ModulesScreen = () => {
                     <span className={`status-badge ${module.active ? 'active' : 'inactive'}`}>
                       {module.active ? 'Active' : 'Inactive'}
                     </span>
-                    <button 
-                      className="btn-icon delete" 
-                      onClick={() => handleDeleteClick(module._id)}
-                      title="Delete Module"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    <div style={{display: 'flex', gap: '8px', marginTop: '10px'}}>
+                      <button 
+                        className="btn-icon edit" 
+                        onClick={() => handleEditClick(module)}
+                        title="Edit Module"
+                      >
+                        <Edit2 size={18} />
+                      </button>
+                      <button 
+                        className="btn-icon delete" 
+                        onClick={() => handleDeleteClick(module._id)}
+                        title="Delete Module"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

@@ -8,6 +8,8 @@ router.route('/')
   .post(upload.single('image'), moduleController.createModule)
   .get(moduleController.getModules);
 
-router.delete('/:id', moduleController.deleteModule);
+router.route('/:id')
+  .put(moduleController.updateModule)
+  .delete(moduleController.deleteModule);
 
 export default router;

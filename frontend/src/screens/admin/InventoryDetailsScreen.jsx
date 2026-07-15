@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { productService } from '../../api/productService';
+import ProductModal from '../../components/admin/ProductModal';
 import './InventoryDetailsScreen.css';
 
 const InventoryDetailsScreen = () => {
@@ -9,22 +10,23 @@ const InventoryDetailsScreen = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Overview');
   const tabs = ['Overview', 'Purchases', 'Adjustments', 'History'];
 
+  const fetchProductDetails = async () => {
+    try {
+      setLoading(true);
+      const data = await productService.getProductById(id);
+      setProduct(data.data ? data.data : data);
+    } catch (err) {
+      console.error('Error fetching product details:', err);
+      setError('Error loading product details.');
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchProductDetails = async () => {
-      try {
-        setLoading(true);
-        const data = await productService.getProductById(id);
-        setProduct(data.data ? data.data : data);
-      } catch (err) {
-        console.error('Error fetching product details:', err);
-        setError('Error loading product details.');
-      } finally {
-        setLoading(false);
-      }
-    };
     if (id) fetchProductDetails();
   }, [id]);
 
@@ -189,7 +191,7 @@ const InventoryDetailsScreen = () => {
       <div className="details-header">
         <h2 className="product-name-title">{product.product_name}</h2>
         <div className="details-actions">
-          <button className="btn-edit">
+          <button className="btn-edit" onClick={() => setIsModalOpen(true)}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -212,6 +214,13 @@ const InventoryDetailsScreen = () => {
       </div>
 
       {renderTabContent()}
+
+      <ProductModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onProductAdded={fetchProductDetails}
+        initialData={product}
+      />
     </div>
   );
 };

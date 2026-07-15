@@ -22,25 +22,19 @@ const ProductDetailsScreen = () => {
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSizingOpen, setIsSizingOpen] = useState(false);
-  const [isColorOpen, setIsColorOpen] = useState(false);
   const [isReviewsOpen, setIsReviewsOpen] = useState(false);
   const [isMaterialsOpen, setIsMaterialsOpen] = useState(false);
   const [isCareOpen, setIsCareOpen] = useState(false);
   const [isShippingOpen, setIsShippingOpen] = useState(false);
   
   const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedColor, setSelectedColor] = useState(null);
 
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [reviewMsg, setReviewMsg] = useState('');
 
   const sizes = ['XS', 'S', 'M', 'L', 'XL'];
-  const colors = [
-    { id: 'light-grey', hex: '#d9d9d9' },
-    { id: 'dark-brown', hex: '#594444' },
-    { id: 'dark-grey', hex: '#404040' }
-  ];
+
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -57,16 +51,14 @@ const ProductDetailsScreen = () => {
   }, [id]);
 
   const handleAddToCart = () => {
-    if (!selectedSize || !selectedColor) {
-      showToast("Please select a size and color first.", "error");
+    if (!selectedSize) {
+      showToast("Please select a size first.", "error");
       return;
     }
-    // Añadimos el producto y las opciones al carrito. 
-    // Clonamos el producto para incluir la selección
     const cartProduct = {
       ...product,
       selectedSize,
-      selectedColor
+      selectedColor: product.color || ''
     };
     addToCart(cartProduct, 1);
     showToast('Added to bag!', 'success');
@@ -147,30 +139,7 @@ const ProductDetailsScreen = () => {
                 )}
               </div>
               
-              <div className="accordion-section">
-                <button 
-                  className="accordion-header" 
-                  onClick={() => setIsColorOpen(!isColorOpen)}
-                >
-                  <span>COLOR {selectedColor ? `- ${selectedColor}` : ''}</span>
-                  {isColorOpen ? <Minus size={16} /> : <Plus size={16} />}
-                </button>
-                {isColorOpen && (
-                  <div className="accordion-content">
-                    <div className="color-options">
-                      {colors.map(color => (
-                        <button 
-                          key={color.id}
-                          className={`color-btn ${selectedColor === color.id ? 'selected' : ''}`}
-                          style={{ backgroundColor: color.hex }}
-                          onClick={() => setSelectedColor(color.id)}
-                          aria-label={`Select ${color.id}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+
 
               {/* MATERIALS */}
               <div className="accordion-section">

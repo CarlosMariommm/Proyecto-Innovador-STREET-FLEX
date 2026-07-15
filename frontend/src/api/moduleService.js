@@ -14,6 +14,10 @@ export const moduleService = {
     });
     return response.data;
   },
+  updateModule: async (id, data) => {
+    const response = await api.put(`/modules/${id}`, data);
+    return response.data;
+  },
   deleteModule: async (id) => {
     const response = await api.delete(`/modules/${id}`);
     return response.data;

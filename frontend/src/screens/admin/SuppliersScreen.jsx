@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Edit2, Trash2 } from 'lucide-react';
 import SupplierModal from '../../components/admin/SupplierModal';
 import { supplierService } from '../../api/supplierService';
 import './SuppliersScreen.css';
@@ -9,6 +10,7 @@ const SuppliersScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [filterQuery, setFilterQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [showFilter, setShowFilter] = useState(false);
@@ -45,6 +47,16 @@ const SuppliersScreen = () => {
     setFilteredSuppliers(result);
   }, [filterQuery, filterStatus, suppliers]);
 
+  const handleEditClick = (supplier) => {
+    setSelectedSupplier(supplier);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedSupplier(null);
+  };
+
   return (
     <div className="suppliers-container">
       <div className="suppliers-header">
@@ -60,7 +72,7 @@ const SuppliersScreen = () => {
           <button className="btn-filter" onClick={() => setShowFilter(v => !v)}>
             Filters {showFilter ? '▲' : '▼'}
           </button>
-          <button className="btn-add" onClick={() => setIsModalOpen(true)}>Add Supplier</button>
+          <button className="btn-add" onClick={() => { setSelectedSupplier(null); setIsModalOpen(true); }}>Add Supplier</button>
         </div>
       </div>
 
@@ -91,6 +103,7 @@ const SuppliersScreen = () => {
               <th>Email</th>
               <th>Contact Number</th>
               <th>Active</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -108,6 +121,18 @@ const SuppliersScreen = () => {
                   <td className={`status-${supplier.active ? 'green' : 'red'}`}>
                     {supplier.active ? 'Active' : 'Inactive'}
                   </td>
+                  <td>
+                    <div style={{display: 'flex', gap: '8px'}}>
+                      <button 
+                        className="btn-icon edit" 
+                        onClick={() => handleEditClick(supplier)}
+                        title="Edit Supplier"
+                        style={{background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary-color)'}}
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))
             )}
@@ -123,8 +148,9 @@ const SuppliersScreen = () => {
 
       <SupplierModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
         onSupplierAdded={fetchSuppliers}
+        initialData={selectedSupplier}
       />
     </div>
   );

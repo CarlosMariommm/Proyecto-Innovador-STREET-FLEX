@@ -8,4 +8,8 @@ router.route('/')
   .post(upload.single('image'), supplierController.createSupplier)
   .get(supplierController.getSuppliers);
 
+router.route('/:id')
+  .put(upload.single('image'), supplierController.updateSupplier)
+  .delete(supplierController.deleteSupplier);
+
 export default router;

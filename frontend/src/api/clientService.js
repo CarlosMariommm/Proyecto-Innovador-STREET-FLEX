@@ -22,6 +22,10 @@ export const clientService = {
     const response = await api.get('/clients');
     return response.data;
   },
+  updateClient: async (id, data) => {
+    const response = await api.put(`/clients/${id}`, data);
+    return response.data;
+  },
   deleteClient: async (id) => {
     const response = await api.delete(`/clients/${id}`);
     return response.data;

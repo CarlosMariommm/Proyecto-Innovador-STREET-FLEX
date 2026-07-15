@@ -241,4 +241,26 @@ clientController.resetPassword = async (req, res) => {
   }
 };
 
+clientController.updateClient = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { active } = req.body;
+    
+    // Solo permitimos actualizar el estado activo
+    const client = await Client.findByIdAndUpdate(
+      id,
+      { active },
+      { new: true }
+    ).select('-password');
+    
+    if (client) {
+      res.json({ message: "Action done", data: client });
+    } else {
+      res.status(404).json({ message: "Client not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export default clientController;

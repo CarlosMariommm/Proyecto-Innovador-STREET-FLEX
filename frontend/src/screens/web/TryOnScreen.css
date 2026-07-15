@@ -27,23 +27,13 @@
   }
 }
 
+/* ─── Left Column ─── */
 .try-on-left-col {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-}
-
-.add-fav-btn {
-  background-color: var(--border-color);
-  border: none;
-  padding: 8px 16px;
-  font-family: inherit;
-  font-size: 14px;
-  color: var(--primary-color);
-  letter-spacing: 1px;
-  cursor: pointer;
-  margin-bottom: 24px;
+  gap: 20px;
 }
 
 .model-image-container {
@@ -51,19 +41,184 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--border-color);
+  min-height: 450px;
 }
 
 .model-image {
   max-width: 100%;
   max-height: 700px;
   object-fit: contain;
+  transition: opacity 0.3s ease;
+  display: block;
 }
 
+/* ─── Loading Overlay ─── */
+.tryon-loading-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  color: #fff;
+}
+
+.tryon-spinner {
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.tryon-loading-text {
+  letter-spacing: 3px;
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0;
+}
+
+.tryon-loading-sub {
+  font-size: 12px;
+  font-weight: 300;
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+.tryon-loading-hint {
+  font-size: 11px;
+  font-weight: 300;
+  margin-top: 16px;
+  opacity: 0.5;
+  font-style: italic;
+}
+
+/* ─── Result Badge ─── */
+.tryon-result-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: white;
+  padding: 6px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  border-radius: 4px;
+  z-index: 5;
+}
+
+/* ─── Image Actions (Upload / Reset) ─── */
+.tryon-image-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.tryon-upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--primary-color);
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tryon-upload-btn:hover {
+  background-color: var(--primary-color);
+  color: var(--bg-color);
+}
+
+.tryon-reset-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--primary-color);
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tryon-reset-btn:hover {
+  background-color: var(--primary-color);
+  color: var(--bg-color);
+}
+
+/* ─── Selected Garment Info ─── */
+.tryon-selected-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--border-color);
+  width: 100%;
+}
+
+.tryon-selected-thumb {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  background-color: var(--border-color);
+}
+
+.tryon-selected-info > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tryon-selected-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--accent-color);
+  opacity: 0.6;
+}
+
+.tryon-selected-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-color);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ─── Right Column ─── */
 .try-on-right-col {
   flex: 1;
-  padding-top: 60px;
+  padding-top: 20px;
 }
 
+.tryon-title {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 3px;
+}
+
+.tryon-subtitle {
+  color: var(--accent-color);
+  margin-bottom: 2rem;
+  font-weight: 300;
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+/* ─── Accordions ─── */
 .try-on-accordions {
   display: flex;
   flex-direction: column;
@@ -92,6 +247,7 @@
   padding-bottom: 24px;
 }
 
+/* ─── Try-On Items Grid ─── */
 .try-on-items-grid {
   display: flex;
   gap: 16px;
@@ -106,15 +262,49 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.try-on-item-box:hover {
+  transform: scale(1.05);
+}
+
+.try-on-item-box.selected {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
 .try-on-item-box img {
   width: 80%;
   height: 80%;
   object-fit: contain;
-  mix-blend-mode: multiply;
 }
 
+.try-on-item-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 4px;
+  font-size: 9px;
+  color: #fff;
+  text-align: center;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+/* ─── More Collection Section ─── */
 .more-collection-section {
   margin-top: 40px;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  letter-spacing: 3px;
+  color: var(--primary-color);
+  font-weight: 400;
+  margin-bottom: 2rem;
 }

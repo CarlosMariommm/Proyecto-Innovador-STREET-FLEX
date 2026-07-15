@@ -8,7 +8,9 @@ router.route('/')
   .post(clientController.createClient)
   .get(clientController.getClients);
 
-router.delete('/:id', clientController.deleteClient);
+router.route('/:id')
+  .put(clientController.updateClient)
+  .delete(clientController.deleteClient);
 
 router.post('/login', clientController.loginClient);
 router.post('/logout', clientController.logoutClient);

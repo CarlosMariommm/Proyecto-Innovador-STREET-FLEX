@@ -38,4 +38,19 @@ moduleController.deleteModule = async (req, res) => {
   }
 };
 
+moduleController.updateModule = async (req, res) => {
+  try {
+    const { name, active } = req.body;
+    const module = await Module.findByIdAndUpdate(
+      req.params.id,
+      { name, active },
+      { new: true }
+    );
+    if (!module) return res.status(404).json({ message: "Module not found" });
+    res.json({ message: "Module updated", data: module });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 export default moduleController;
