@@ -8,8 +8,15 @@ router.route('/')
   .post(clientController.createClient)
   .get(clientController.getClients);
 
+router.delete('/:id', clientController.deleteClient);
+
 router.post('/login', clientController.loginClient);
 router.post('/logout', clientController.logoutClient);
+
+// Nuevas rutas para verificación y recuperación
+router.get('/verify/:token', clientController.verifyEmail);
+router.post('/forgot-password', clientController.forgotPassword);
+router.post('/reset-password/:token', clientController.resetPassword);
 
 router.route('/profile')
   .get(protectClient, clientController.getClientProfile);

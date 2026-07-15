@@ -2,7 +2,7 @@
   display: flex;
   min-height: 100vh;
   width: 100%;
-  background-color: #f9f9f9;
+  background-color: var(--bg-color);
   font-family: var(--font-family, 'JetBrains Mono', monospace);
 }
 
@@ -17,15 +17,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 32px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
+  background-color: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .admin-search {
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: #f5f5f5;
+  background-color: var(--border-color);
   padding: 8px 16px;
   border-radius: 4px;
   width: 400px;
@@ -38,10 +38,11 @@
   font-family: inherit;
   font-size: 14px;
   outline: none;
+  color: var(--primary-color);
 }
 
 .admin-search svg {
-  color: #999999;
+  color: var(--accent-color);
 }
 
 .admin-user-profile {
@@ -60,23 +61,83 @@
 .user-name {
   font-size: 14px;
   font-weight: 500;
-  color: #333333;
+  color: var(--primary-color);
 }
 
 .user-role {
   font-size: 12px;
-  color: #999999;
+  color: var(--accent-color);
 }
 
 .user-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #000000;
+  background-color: var(--primary-color);
+}
+
+.admin-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.admin-theme-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .admin-page-content {
   padding: 32px;
   flex: 1;
   overflow-y: auto;
+}
+
+.admin-user-profile-wrapper {
+  position: relative;
+}
+
+.admin-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.admin-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--primary-color);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-dropdown-item:hover {
+  background-color: var(--border-color);
+}
+
+.admin-dropdown-item.text-red {
+  color: #ef4444;
 }

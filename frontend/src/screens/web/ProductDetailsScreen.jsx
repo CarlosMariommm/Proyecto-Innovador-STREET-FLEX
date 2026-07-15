@@ -3,15 +3,19 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../../components/web/Header';
 import Sidebar from '../../components/web/Sidebar';
 import ProductGrid from '../../components/web/ProductGrid';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, Star } from 'lucide-react';
 import { productService } from '../../api/productService';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
 import './ProductDetailsScreen.css';
 
 const ProductDetailsScreen = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const { showToast } = useToast();
   
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,9 +23,17 @@ const ProductDetailsScreen = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSizingOpen, setIsSizingOpen] = useState(false);
   const [isColorOpen, setIsColorOpen] = useState(false);
+  const [isReviewsOpen, setIsReviewsOpen] = useState(false);
+  const [isMaterialsOpen, setIsMaterialsOpen] = useState(false);
+  const [isCareOpen, setIsCareOpen] = useState(false);
+  const [isShippingOpen, setIsShippingOpen] = useState(false);
   
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
+
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [reviewMsg, setReviewMsg] = useState('');
 
   const sizes = ['XS', 'S', 'M', 'L', 'XL'];
   const colors = [
@@ -46,7 +58,7 @@ const ProductDetailsScreen = () => {
 
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColor) {
-      alert("Please select a size and color first.");
+      showToast("Please select a size and color first.", "error");
       return;
     }
     // Añadimos el producto y las opciones al carrito. 
@@ -57,11 +69,26 @@ const ProductDetailsScreen = () => {
       selectedColor
     };
     addToCart(cartProduct, 1);
-    alert('Added to bag!');
+    showToast('Added to bag!', 'success');
   };
 
-  if (loading) return <div style={{ color: 'white', padding: '2rem' }}>Loading product...</div>;
-  if (!product) return <div style={{ color: 'white', padding: '2rem' }}>Product not found.</div>;
+  const submitReview = async (e) => {
+    e.preventDefault();
+    if (!user) return showToast("Debes iniciar sesión para valorar.", "error");
+    try {
+      const res = await productService.addReview(id, { id_client: user._id, rating, comment });
+      setReviewMsg(res.message);
+      // Reload product to get new reviews
+      const prodRes = await productService.getProductById(id);
+      setProduct(prodRes.data || prodRes);
+      setComment('');
+    } catch (err) {
+      setReviewMsg(err.response?.data?.message || "Error al enviar la valoración");
+    }
+  };
+
+  if (loading) return <div style={{ color: 'var(--primary-color)', padding: '2rem' }}>Loading product...</div>;
+  if (!product) return <div style={{ color: 'var(--primary-color)', padding: '2rem' }}>Product not found.</div>;
 
   return (
     <div className="product-details-container">
@@ -141,6 +168,117 @@ const ProductDetailsScreen = () => {
                         />
                       ))}
                     </div>
+                  </div>
+                )}
+              </div>
+
+              {/* MATERIALS */}
+              <div className="accordion-section">
+                <button 
+                  className="accordion-header" 
+                  onClick={() => setIsMaterialsOpen(!isMaterialsOpen)}
+                >
+                  <span>MATERIALS</span>
+                  {isMaterialsOpen ? <Minus size={16} /> : <Plus size={16} />}
+                </button>
+                {isMaterialsOpen && (
+                  <div className="accordion-content">
+                    <p style={{ fontWeight: 300, fontSize: '14px', lineHeight: '1.6' }}>
+                      {product.material || "100% premium materials. Check label for specific blend."}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* CARE INSTRUCTIONS */}
+              <div className="accordion-section">
+                <button 
+                  className="accordion-header" 
+                  onClick={() => setIsCareOpen(!isCareOpen)}
+                >
+                  <span>CARE INSTRUCTIONS</span>
+                  {isCareOpen ? <Minus size={16} /> : <Plus size={16} />}
+                </button>
+                {isCareOpen && (
+                  <div className="accordion-content">
+                    <p style={{ fontWeight: 300, fontSize: '14px', lineHeight: '1.6' }}>
+                      {product.care_instructions || "Machine wash cold with like colors. Do not bleach. Tumble dry low."}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* SHIPPING & RETURNS */}
+              <div className="accordion-section">
+                <button 
+                  className="accordion-header" 
+                  onClick={() => setIsShippingOpen(!isShippingOpen)}
+                >
+                  <span>SHIPPING & RETURNS</span>
+                  {isShippingOpen ? <Minus size={16} /> : <Plus size={16} />}
+                </button>
+                {isShippingOpen && (
+                  <div className="accordion-content">
+                    <p style={{ fontWeight: 300, fontSize: '14px', lineHeight: '1.6' }}>
+                      {product.shipping_returns || "Free shipping on orders over $150. Returns accepted within 14 days of delivery. Items must be unworn with original tags attached."}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Seccion de Reseñas */}
+              <div className="accordion-section">
+                <button 
+                  className="accordion-header" 
+                  onClick={() => setIsReviewsOpen(!isReviewsOpen)}
+                >
+                  <span>REVIEWS ({product.reviews?.length || 0}) {product.average_rating ? `⭐ ${product.average_rating.toFixed(1)}` : ''}</span>
+                  {isReviewsOpen ? <Minus size={16} /> : <Plus size={16} />}
+                </button>
+                {isReviewsOpen && (
+                  <div className="accordion-content" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingBottom: '1rem' }}>
+                    {product.reviews?.length > 0 ? (
+                      product.reviews.map((r, i) => (
+                        <div key={i} style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                            <strong>{r.id_client?.full_name || 'Usuario'}</strong>
+                            <span>{'⭐'.repeat(r.rating)}</span>
+                          </div>
+                          <p style={{ fontWeight: 300, fontSize: '14px', margin: 0 }}>{r.comment}</p>
+                          <small style={{ color: 'var(--accent-color)', fontSize: '12px' }}>{new Date(r.date).toLocaleDateString()}</small>
+                        </div>
+                      ))
+                    ) : (
+                      <p style={{ fontWeight: 300, fontSize: '14px' }}>No hay reseñas aún.</p>
+                    )}
+
+                    {user && user.role === 'client' && (
+                      <form onSubmit={submitReview} style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <h4 style={{ fontWeight: 400 }}>Deja tu valoración</h4>
+                        {reviewMsg && <div style={{ fontSize: '13px', color: reviewMsg.includes('éxito') ? '#22c55e' : '#ff4444' }}>{reviewMsg}</div>}
+                        <select 
+                          value={rating} 
+                          onChange={(e) => setRating(e.target.value)}
+                          style={{ padding: '0.5rem', background: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--border-color)' }}
+                        >
+                          <option value="5">5 - Excelente</option>
+                          <option value="4">4 - Muy bueno</option>
+                          <option value="3">3 - Bueno</option>
+                          <option value="2">2 - Regular</option>
+                          <option value="1">1 - Malo</option>
+                        </select>
+                        <textarea 
+                          placeholder="Cuéntanos qué te pareció..." 
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                          style={{ padding: '0.5rem', background: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--border-color)', minHeight: '60px' }}
+                          required
+                        />
+                        <button type="submit" style={{ padding: '0.5rem', background: 'var(--primary-color)', color: 'var(--bg-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                          Enviar
+                        </button>
+                      </form>
+                    )}
                   </div>
                 )}
               </div>

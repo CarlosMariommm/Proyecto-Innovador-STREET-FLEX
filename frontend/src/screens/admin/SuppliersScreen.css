@@ -1,14 +1,17 @@
+/* SuppliersScreen.css */
+
 .suppliers-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  gap: 0;
+  color: var(--primary-color);
 }
 
 .suppliers-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .suppliers-title {
@@ -16,37 +19,119 @@
   font-weight: 500;
   letter-spacing: 2px;
   margin: 0;
+  color: var(--primary-color);
 }
 
 .suppliers-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
+  align-items: center;
 }
 
-.suppliers-actions button {
-  padding: 8px 16px;
-  font-family: inherit;
-  font-size: 14px;
+.filter-input {
+  padding: 8px 14px;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  cursor: pointer;
+  background-color: transparent;
+  color: var(--primary-color);
+  font-family: inherit;
+  font-size: 13px;
+  width: 180px;
+}
+
+.filter-input::placeholder {
+  color: var(--accent-color);
 }
 
 .btn-add {
+  padding: 8px 16px;
   background-color: #0d6efd;
   color: #ffffff;
   border: none;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.btn-filter, .btn-download {
-  background-color: #ffffff;
-  color: #333333;
-  border: 1px solid #cccccc;
+.btn-add:hover {
+  background-color: #0b5ed7;
+}
+
+.btn-filter {
+  padding: 8px 16px;
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-filter:hover {
+  background-color: var(--border-color);
+}
+
+.filter-bar {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  padding: 16px;
+  background-color: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-group label {
+  font-size: 12px;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.filter-group select {
+  padding: 7px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--bg-color);
+  color: var(--primary-color);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn-clear-filter {
+  padding: 7px 14px;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--accent-color);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-clear-filter:hover {
+  border-color: #ef4444;
+  color: #ef4444;
 }
 
 .suppliers-table-container {
-  flex: 1;
   overflow-x: auto;
-  background-color: #f9f9f9;
+  background-color: var(--bg-color);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
 }
 
 .suppliers-table {
@@ -57,51 +142,47 @@
 }
 
 .suppliers-table th {
-  padding: 16px;
-  color: #666666;
+  padding: 14px 16px;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
   font-weight: 500;
-  border-bottom: 2px solid #e0e0e0;
+  font-size: 13px;
+  border-bottom: 2px solid var(--border-color);
 }
 
 .suppliers-table td {
-  padding: 16px;
-  color: #333333;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 14px 16px;
+  color: var(--primary-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
-.product-col {
-  color: #666666;
-  font-size: 12px;
-  letter-spacing: 0.5px;
-}
-
-.status-green {
-  color: #28a745;
-}
-
-.status-red {
-  color: #dc3545;
-}
+.status-green { color: #4ade80; font-weight: 500; }
+.status-red { color: #ef4444; font-weight: 500; }
 
 .suppliers-pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 24px;
-  padding-top: 16px;
+  margin-top: 20px;
 }
 
 .btn-page {
   padding: 8px 16px;
-  background-color: #ffffff;
-  border: 1px solid #cccccc;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-family: inherit;
   font-size: 14px;
   cursor: pointer;
+  color: var(--primary-color);
+  transition: background-color 0.2s;
+}
+
+.btn-page:hover {
+  background-color: var(--border-color);
 }
 
 .suppliers-pagination span {
   font-size: 14px;
-  color: #666666;
+  color: var(--accent-color);
 }

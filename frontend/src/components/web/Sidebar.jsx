@@ -1,20 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { moduleService } from '../../api/moduleService';
 import './Sidebar.css';
 
-const CATEGORIES = [
-  'NEW COLLECTION',
-  'BEST SELLERS',
-  'ESSENTIALS',
-  'JEANS',
-  'T-SHIRT',
-  'TOPS & BODYSUITS',
-  'SHIRT & BLOUSES',
-  'HOODIES'
-];
-
 const Sidebar = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState('WOMEN');
+  const [modules, setModules] = useState([]);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isOpen) {
+      const fetchModules = async () => {
+        try {
+          const res = await moduleService.getModules();
+          setModules(res.data || res);
+        } catch (error) {
+          console.error("Error fetching modules", error);
+        }
+      };
+      fetchModules();
+    }
+  }, [isOpen]);
+
+  const handleModuleClick = (modId) => {
+    navigate(`/?module=${modId}`);
+    onClose();
+  };
 
   return (
     <>
@@ -30,19 +43,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <div className="sidebar-tabs">
-          <button 
-            className={`tab-btn ${activeTab === 'WOMEN' ? 'active' : ''}`}
-            onClick={() => setActiveTab('WOMEN')}
-          >
-            WOMEN
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'MEN' ? 'active' : ''}`}
-            onClick={() => setActiveTab('MEN')}
-          >
-            MEN
-          </button>
+        <div className="sidebar-tabs" style={{ display: 'none' }}>
         </div>
 
         <div className="sidebar-search">
@@ -52,13 +53,25 @@ const Sidebar = ({ isOpen, onClose }) => {
 
         <nav className="sidebar-nav">
           <ul>
-            {CATEGORIES.map((category, index) => (
-              <li key={index}>
-                <a href={`#${category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`}>
-                  {category}
+            <li key="all">
+              <a href="#" onClick={(e) => { e.preventDefault(); navigate('/'); onClose(); }}>
+                TODOS LOS PRODUCTOS
+              </a>
+            </li>
+            {modules.filter(m => m.active).map((module) => (
+              <li key={module._id}>
+                <a href={`#${module.name.toLowerCase()}`} onClick={(e) => { e.preventDefault(); handleModuleClick(module._id); }}>
+                  {module.name.toUpperCase()}
                 </a>
               </li>
             ))}
+            {user && user.role === 'admin' && (
+              <li key="admin-panel" style={{ marginTop: '2rem' }}>
+                <a href="#" onClick={(e) => { e.preventDefault(); navigate('/admin/dashboard'); onClose(); }} style={{ color: '#22c55e', fontWeight: 'bold' }}>
+                  ADMIN PANEL
+                </a>
+              </li>
+            )}
           </ul>
         </nav>
       </aside>

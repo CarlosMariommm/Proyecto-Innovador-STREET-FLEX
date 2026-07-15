@@ -1,6 +1,8 @@
 import Client from '../models/clientModel.js';
 import bcrypt from 'bcryptjs';
 import generateToken from '../utils/generateToken.js';
+import crypto from 'crypto';
+import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/mailer.js';
 
 const clientController = {};
 
@@ -17,11 +19,18 @@ clientController.createClient = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const verificationToken = crypto.randomBytes(20).toString('hex');
+
     const client = await Client.create({
-      username, email, password: hashedPassword, full_name, phone_number, image, active, verified
+      username, email, password: hashedPassword, full_name, phone_number, image, active, verified: false, verificationToken
     });
 
     if (client) {
+      try {
+        await sendVerificationEmail(client.email, verificationToken);
+      } catch (err) {
+        console.error("Error al enviar correo:", err);
+      }
       generateToken(res, client._id);
       res.status(201).json({
         _id: client._id,
@@ -45,6 +54,10 @@ clientController.loginClient = async (req, res) => {
     const client = await Client.findOne({ email });
 
     if (client && (await bcrypt.compare(password, client.password))) {
+      if (!client.verified) {
+        return res.status(401).json({ message: 'Por favor, verifica tu correo electrónico antes de iniciar sesión' });
+      }
+
       generateToken(res, client._id);
       
       res.json({
@@ -106,6 +119,16 @@ clientController.getClients = async (req, res) => {
   }
 };
 
+clientController.deleteClient = async (req, res) => {
+  try {
+    const client = await Client.findByIdAndDelete(req.params.id);
+    if (!client) return res.status(404).json({ message: 'Client not found' });
+    res.json({ message: 'Client deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 clientController.addFavorite = async (req, res) => {
   try {
     const { productId } = req.body;
@@ -148,6 +171,73 @@ clientController.getFavorites = async (req, res) => {
     res.json(client.favorites);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+clientController.verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const client = await Client.findOne({ verificationToken: token });
+
+    if (!client) {
+      return res.status(400).json({ message: 'Token inválido o expirado' });
+    }
+
+    client.verified = true;
+    client.verificationToken = undefined;
+    await client.save();
+
+    res.json({ message: 'Correo verificado con éxito' });
+  } catch (error) {
+    res.status(500).json({ message: "Error del servidor" });
+  }
+};
+
+clientController.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const client = await Client.findOne({ email });
+
+    if (!client) {
+      return res.status(404).json({ message: 'No existe una cuenta con ese correo' });
+    }
+
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    client.resetPasswordToken = resetToken;
+    client.resetPasswordExpires = Date.now() + 3600000; // 1 hora
+    await client.save();
+
+    await sendPasswordResetEmail(client.email, resetToken);
+
+    res.json({ message: 'Correo de recuperación enviado' });
+  } catch (error) {
+    res.status(500).json({ message: "Error del servidor" });
+  }
+};
+
+clientController.resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const client = await Client.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!client) {
+      return res.status(400).json({ message: 'El token es inválido o ha expirado' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    client.password = await bcrypt.hash(password, salt);
+    client.resetPasswordToken = undefined;
+    client.resetPasswordExpires = undefined;
+    await client.save();
+
+    res.json({ message: 'Contraseña actualizada con éxito' });
+  } catch (error) {
+    res.status(500).json({ message: "Error del servidor" });
   }
 };
 

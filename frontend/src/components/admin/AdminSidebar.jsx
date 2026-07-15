@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Package, Users, Settings, Truck, Box } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Users2, Settings, Truck, Box, Layers, Image } from 'lucide-react';
 import './AdminSidebar.css';
 
 const AdminSidebar = () => {
@@ -9,10 +9,13 @@ const AdminSidebar = () => {
   const navItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Inventory', path: '/admin/inventory', icon: Package },
-    { name: 'Employees', path: '/admin/employees', icon: Users },
-    { name: 'Account', path: '/admin/account', icon: Settings },
+    { name: 'Categories', path: '/admin/categories', icon: Users },
+    { name: 'Modules', path: '/admin/modules', icon: Layers },
+    { name: 'Banners', path: '/admin/banners', icon: Image },
+    { name: 'Clients', path: '/admin/clients', icon: Users2 },
     { name: 'Suppliers', path: '/admin/suppliers', icon: Truck },
     { name: 'Deliveries', path: '/admin/deliveries', icon: Box },
+    { name: 'Account', path: '/admin/account', icon: Settings },
   ];
 
   return (

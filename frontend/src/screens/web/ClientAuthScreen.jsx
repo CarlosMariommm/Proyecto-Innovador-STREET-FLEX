@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 import { clientService } from '../../api/clientService';
+import { useToast } from '../../hooks/useToast';
 import './ClientAuthScreen.css';
 
 const ClientAuthScreen = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/account';
+  // Safe extraction of the 'from' path
+  const from = location.state?.from?.pathname || location.state?.from || '/account';
 
+  const { loginClient } = useAuth();
+  const { showToast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -27,28 +31,34 @@ const ClientAuthScreen = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     try {
       if (isLogin) {
-        const data = await clientService.login(formData.email, formData.password);
-        localStorage.setItem('clientInfo', JSON.stringify(data));
-        navigate(from, { replace: true });
+        // Usar el AuthContext para el login del cliente
+        const result = await loginClient(formData.email, formData.password);
+        if (result.success) {
+          showToast('Bienvenido a Street Flex', 'success');
+          // Navigate works with strings or location objects, so we safely pass the string
+          navigate(typeof from === 'string' ? from : '/account', { replace: true });
+        } else {
+          showToast(result.message, 'error');
+        }
       } else {
-        const data = await clientService.createClient({
+        // Para el registro usamos el servicio directamente
+        await clientService.createClient({
           ...formData,
           active: true,
           verified: false
         });
-        localStorage.setItem('clientInfo', JSON.stringify(data));
-        navigate(from, { replace: true });
+        showToast('¡Cuenta creada! Revisa tu correo electrónico para verificar tu cuenta.', 'success');
+        setIsLogin(true);
       }
     } catch (err) {
       console.error("Auth error:", err);
       if (!err.response) {
-        setError('Error de conexión. Verifica que el servidor (backend) esté encendido.');
+        showToast('Error de conexión. Verifica que el servidor (backend) esté encendido.', 'error');
       } else {
-        setError(err.response?.data?.message || 'Error en la autenticación');
+        showToast(err.response?.data?.message || 'Error en la autenticación', 'error');
       }
     } finally {
       setLoading(false);
@@ -71,8 +81,6 @@ const ClientAuthScreen = () => {
             <h3>{isLogin ? 'Sign In' : 'Create Account'}</h3>
             <p>{isLogin ? 'Welcome back to your account.' : 'Join the Street Flex community.'}</p>
           </div>
-          
-          {error && <div style={{ color: '#ff4444', marginBottom: '15px' }}>{error}</div>}
           
           <form className="client-auth-form" onSubmit={handleSubmit}>
             {!isLogin && (
@@ -107,6 +115,12 @@ const ClientAuthScreen = () => {
               {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account'}
             </button>
           </form>
+
+          {isLogin && (
+            <p className="forgot-password">
+              <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+            </p>
+          )}
           
           <p className="toggle-mode">
             {isLogin ? "Don't have an account?" : "Already have an account?"}

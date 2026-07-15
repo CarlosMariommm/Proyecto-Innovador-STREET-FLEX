@@ -1,26 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { adminService } from '../../api/adminService';
+import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
 import './AdminAuthScreen.css';
 
 const AdminAuthScreen = () => {
   const navigate = useNavigate();
+  const { loginAdmin } = useAuth();
+  const { showToast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
     try {
-      const data = await adminService.login(email, password);
-      // Guardar información básica de sesión (el token viaja en cookie HTTP-only)
-      localStorage.setItem('adminInfo', JSON.stringify(data));
-      navigate('/admin/dashboard');
+      const result = await loginAdmin(email, password);
+      if (result.success) {
+        showToast('Bienvenido al panel de administración', 'success');
+        navigate('/admin/dashboard');
+      } else {
+        showToast(result.message, 'error');
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al iniciar sesión');
+      showToast(err.response?.data?.message || 'Error al iniciar sesión', 'error');
     } finally {
       setLoading(false);
     }
@@ -42,8 +46,6 @@ const AdminAuthScreen = () => {
             <h3>Sign in</h3>
             <p>Accede al panel de administración.</p>
           </div>
-          
-          {error && <div style={{ color: 'red', marginBottom: '15px' }}>{error}</div>}
           
           <form className="admin-auth-form" onSubmit={handleLogin}>
             

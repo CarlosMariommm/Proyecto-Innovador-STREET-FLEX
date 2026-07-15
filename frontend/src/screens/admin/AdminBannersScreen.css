@@ -1,0 +1,2 @@
+/* Re-use ModuleScreen CSS layout since it's the exact same structure */
+@import './ModulesScreen.css';

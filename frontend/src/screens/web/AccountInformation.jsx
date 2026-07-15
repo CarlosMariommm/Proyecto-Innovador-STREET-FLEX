@@ -9,13 +9,26 @@ const AccountInformation = () => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: client.full_name || '',
-    email: client.email || '',
-    phone: client.phone_number || '',
+    name: client?.full_name || '',
+    email: client?.email || '',
+    phone: client?.phone_number || '',
     city: 'New York City',
     address: '100 Main St',
     postalCode: '10001'
   });
+
+  React.useEffect(() => {
+    if (client) {
+      setFormData({
+        name: client.full_name || '',
+        email: client.email || '',
+        phone: client.phone_number || '',
+        city: 'New York City',
+        address: '100 Main St',
+        postalCode: '10001'
+      });
+    }
+  }, [client]);
 
   const handleChange = (e) => {
     setFormData({

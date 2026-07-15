@@ -5,40 +5,81 @@ import './SuppliersScreen.css';
 
 const SuppliersScreen = () => {
   const [suppliers, setSuppliers] = useState([]);
+  const [filteredSuppliers, setFilteredSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filterQuery, setFilterQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [showFilter, setShowFilter] = useState(false);
 
   const fetchSuppliers = async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await supplierService.getSuppliers();
-      setSuppliers(Array.isArray(data) ? data : data.data || []);
+      const list = Array.isArray(data) ? data : data.data || [];
+      setSuppliers(list);
+      setFilteredSuppliers(list);
     } catch (err) {
-      setError('Error al cargar proveedores. Verifica la conexión.');
+      setError('Error loading suppliers. Check connection.');
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => { fetchSuppliers(); }, []);
+
   useEffect(() => {
-    fetchSuppliers();
-  }, []);
+    let result = [...suppliers];
+    if (filterQuery) {
+      const q = filterQuery.toLowerCase();
+      result = result.filter(s =>
+        s.supp_name?.toLowerCase().includes(q) ||
+        s.email?.toLowerCase().includes(q)
+      );
+    }
+    if (filterStatus === 'active') result = result.filter(s => s.active);
+    if (filterStatus === 'inactive') result = result.filter(s => !s.active);
+    setFilteredSuppliers(result);
+  }, [filterQuery, filterStatus, suppliers]);
 
   return (
     <div className="suppliers-container">
       <div className="suppliers-header">
         <h1 className="suppliers-title">SUPPLIERS</h1>
-        
         <div className="suppliers-actions">
+          <input
+            type="text"
+            placeholder="Search suppliers..."
+            className="filter-input"
+            value={filterQuery}
+            onChange={e => setFilterQuery(e.target.value)}
+          />
+          <button className="btn-filter" onClick={() => setShowFilter(v => !v)}>
+            Filters {showFilter ? '▲' : '▼'}
+          </button>
           <button className="btn-add" onClick={() => setIsModalOpen(true)}>Add Supplier</button>
-          <button className="btn-filter">Filters</button>
-          <button className="btn-download">Download all</button>
         </div>
       </div>
-      
+
+      {showFilter && (
+        <div className="filter-bar">
+          <div className="filter-group">
+            <label>Status</label>
+            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+              <option value="">All</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <button className="btn-clear-filter" onClick={() => { setFilterQuery(''); setFilterStatus(''); }}>
+            Clear Filters
+          </button>
+        </div>
+      )}
+
       {error && <div style={{ color: 'red', margin: '10px 0' }}>{error}</div>}
 
       <div className="suppliers-table-container">
@@ -55,10 +96,10 @@ const SuppliersScreen = () => {
           <tbody>
             {loading ? (
               <tr><td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>Loading suppliers...</td></tr>
-            ) : suppliers.length === 0 ? (
+            ) : filteredSuppliers.length === 0 ? (
               <tr><td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>No suppliers found.</td></tr>
             ) : (
-              suppliers.map((supplier) => (
+              filteredSuppliers.map((supplier) => (
                 <tr key={supplier._id || supplier.id}>
                   <td>{supplier.supp_name}</td>
                   <td>{supplier.direction || '-'}</td>
@@ -73,16 +114,16 @@ const SuppliersScreen = () => {
           </tbody>
         </table>
       </div>
-      
+
       <div className="suppliers-pagination">
         <button className="btn-page">Previous</button>
         <span>Page 1 of 1</span>
         <button className="btn-page">Next</button>
       </div>
 
-      <SupplierModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+      <SupplierModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
         onSupplierAdded={fetchSuppliers}
       />
     </div>

@@ -11,13 +11,13 @@ const createInitialAdmin = async () => {
     await mongoose.connect(process.env.DB_URI || 'mongodb://localhost:27017/streetflex');
     console.log('✅ Conectado a MongoDB...');
 
-    const email = 'admin@streetflex.com';
-    const password = 'mypassword';
+    const email = 'spidey6809@gmial.com';
+    const password = 'Admin123';
 
     // Verificar si ya existe
     const adminExists = await Admin.findOne({ email });
     if (adminExists) {
-      console.log('⚠️ El administrador ya existe. Puedes iniciar sesión con admin@streetflex.com');
+      console.log(`⚠️ El administrador ya existe. Puedes iniciar sesión con ${email}`);
       process.exit();
     }
 
@@ -27,10 +27,10 @@ const createInitialAdmin = async () => {
 
     // Crear admin
     const admin = await Admin.create({
-      username: 'admin_demo',
+      username: 'spidey6809',
       email: email,
       password: hashedPassword,
-      full_name: 'Ema Admin',
+      full_name: 'Spidey Admin',
       active: true
     });
 

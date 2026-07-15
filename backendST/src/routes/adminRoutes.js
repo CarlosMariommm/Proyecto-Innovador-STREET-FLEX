@@ -12,6 +12,7 @@ router.post('/login', adminController.loginAdmin);
 router.post('/logout', adminController.logoutAdmin);
 
 router.route('/profile')
-  .get(protect, adminController.getAdminProfile);
+  .get(protect, adminController.getAdminProfile)
+  .put(protect, adminController.updateAdminProfile);
 
 export default router;

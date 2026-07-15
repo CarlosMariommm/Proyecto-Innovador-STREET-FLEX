@@ -11,4 +11,7 @@ router.route('/')
 router.route('/:id')
   .get(productController.getProductById);
 
+router.route('/:id/reviews')
+  .post(productController.addReview);
+
 export default router;

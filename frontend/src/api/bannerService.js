@@ -1,0 +1,31 @@
+import api from './api';
+
+export const bannerService = {
+  getBanners: async () => {
+    const response = await api.get('/banners');
+    return response.data;
+  },
+  
+  createBanner: async (bannerData) => {
+    const response = await api.post('/banners', bannerData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+  
+  updateBanner: async (id, bannerData) => {
+    const response = await api.put(`/banners/${id}`, bannerData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+  
+  deleteBanner: async (id) => {
+    const response = await api.delete(`/banners/${id}`);
+    return response.data;
+  }
+};

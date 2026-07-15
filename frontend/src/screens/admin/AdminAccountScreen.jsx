@@ -1,19 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminService } from '../../api/adminService';
+import { useToast } from '../../hooks/useToast';
+import { useAuth } from '../../hooks/useAuth';
 import './AdminAccountScreen.css';
 
 const AdminAccountScreen = () => {
   const navigate = useNavigate();
-  const [admin, setAdmin] = useState(null);
+  const { showToast } = useToast();
+  const { user } = useAuth();
+  
+  const [admin, setAdmin] = useState(user || null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState(user?.full_name || '');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const fetchAdmin = async () => {
       try {
         const data = await adminService.getProfile();
-        // data.data o data, según envíe tu backend
-        setAdmin(data.data ? data.data : data);
+        const profile = data.data ? data.data : data;
+        if (profile && profile.email) {
+            setAdmin(profile);
+            setNewName(profile.full_name || '');
+        }
       } catch (error) {
         console.error("Error fetching admin data:", error);
       } finally {
@@ -30,11 +41,42 @@ const AdminAccountScreen = () => {
       console.error(e);
     }
     localStorage.removeItem('adminInfo');
-    navigate('/admin/login');
+    // Forzar recarga de página para limpiar AuthContext
+    window.location.href = '/admin/login';
   };
 
-  if (loading) {
-    return <div style={{ padding: '20px', color: '#fff' }}>Cargando perfil...</div>;
+  const handleEditClick = () => {
+    setNewName(admin?.full_name || '');
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setNewName(admin?.full_name || '');
+  };
+
+  const handleSave = async () => {
+    if (!newName.trim()) {
+      showToast('Name cannot be empty.', 'error');
+      return;
+    }
+    try {
+      setSaving(true);
+      const data = await adminService.updateProfile({ full_name: newName.trim() });
+      const updated = data.data ? data.data : data;
+      setAdmin(updated);
+      setIsEditing(false);
+      showToast('Name updated successfully!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to update name.', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading && !admin) {
+    return <div style={{ padding: '20px', color: 'var(--primary-color)' }}>Loading profile...</div>;
   }
 
   return (
@@ -62,32 +104,38 @@ const AdminAccountScreen = () => {
           <div className="account-form-row">
             <div className="account-form-group">
               <label>NAME</label>
-              <div className="readonly-input">{admin?.full_name || 'No Admin'}</div>
+              {isEditing ? (
+                <input
+                  type="text"
+                  className="account-edit-input"
+                  value={newName}
+                  onChange={e => setNewName(e.target.value)}
+                  autoFocus
+                />
+              ) : (
+                <div className="readonly-input">{admin?.full_name || 'No Admin'}</div>
+              )}
             </div>
             <div className="account-form-group">
               <label>EMAIL</label>
               <div className="readonly-input">{admin?.email || 'N/A'}</div>
             </div>
           </div>
-          
+
           <div className="account-actions-right">
-            <button className="btn-text">EDIT</button>
+            {isEditing ? (
+              <>
+                <button className="btn-text" onClick={handleCancel} disabled={saving}>CANCEL</button>
+                <button className="btn-save" onClick={handleSave} disabled={saving}>
+                  {saving ? 'SAVING...' : 'SAVE'}
+                </button>
+              </>
+            ) : (
+              <button className="btn-text" onClick={handleEditClick}>EDIT</button>
+            )}
           </div>
           
           <div className="account-form-row mt-6">
-            <div className="account-form-group">
-              <label>USERNAME</label>
-              <div className="readonly-input">{admin?.username || 'N/A'}</div>
-            </div>
-            <div className="account-form-group">
-              <label>STATUS</label>
-              <div className="readonly-input" style={{ color: admin?.active ? 'green' : 'red' }}>
-                {admin ? (admin.active ? 'Active' : 'Inactive') : 'N/A'}
-              </div>
-            </div>
-          </div>
-          
-          <div className="account-form-row">
             <div className="account-form-group full-width">
               <label>ROLE</label>
               <div className="readonly-input">Administrator</div>

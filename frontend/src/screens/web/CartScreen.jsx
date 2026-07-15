@@ -3,23 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/web/Header';
 import Sidebar from '../../components/web/Sidebar';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
 import './CartScreen.css';
 
 const CartScreen = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { cart, updateQuantity, removeFromCart, getCartTotal } = useCart();
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const handleBuy = () => {
-    // Verificamos si hay usuario logueado
-    const clientInfo = localStorage.getItem('clientInfo');
-    if (!clientInfo) {
-      alert("Por favor, inicia sesión para completar tu compra.");
+    // Verificamos si hay usuario logueado usando AuthContext
+    if (!user || user.role !== 'client') {
+      showToast("Por favor, inicia sesión para completar tu compra.", "error");
       navigate('/login', { state: { from: '/cart' } });
       return;
     }
     navigate('/receipt');
   };
+
 
   return (
     <div className="cart-page-container">

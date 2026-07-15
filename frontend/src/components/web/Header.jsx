@@ -1,11 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, User, Shirt, ShoppingCart } from 'lucide-react';
+import { Menu, User, Shirt, ShoppingCart, Moon, Sun } from 'lucide-react';
+import { useContext } from 'react';
+import { ThemeContext } from '../../context/ThemeContext';
 import './Header.css';
 
 const Header = ({ onMenuClick }) => {
+  const { theme, toggleTheme } = useContext(ThemeContext);
+
   return (
-    <header className="header">
+    <header className={`header ${theme === 'dark' ? 'dark-mode' : ''}`}>
       <div className="header-container">
         <div className="header-left">
           <button aria-label="Menu" onClick={onMenuClick}>
@@ -20,6 +24,9 @@ const Header = ({ onMenuClick }) => {
         </div>
 
         <div className="header-right">
+          <button onClick={toggleTheme} aria-label="Toggle theme" className="icon-link theme-toggle">
+            {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
+          </button>
           <Link to="/account" aria-label="User account" className="icon-link">
             <User size={24} />
           </Link>

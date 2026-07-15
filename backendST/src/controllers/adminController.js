@@ -99,6 +99,31 @@ adminController.getAdminProfile = async (req, res) => {
   }
 };
 
+adminController.updateAdminProfile = async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.admin._id);
+
+    if (admin) {
+      admin.full_name = req.body.full_name || admin.full_name;
+
+      const updatedAdmin = await admin.save();
+
+      res.json({
+        _id: updatedAdmin._id,
+        username: updatedAdmin.username,
+        email: updatedAdmin.email,
+        full_name: updatedAdmin.full_name,
+        image: updatedAdmin.image,
+        active: updatedAdmin.active
+      });
+    } else {
+      res.status(404).json({ message: 'Admin not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 adminController.getAdmins = async (req, res) => {
   try {
     const admins = await Admin.find({}).select('-password');

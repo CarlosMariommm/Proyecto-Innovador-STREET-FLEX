@@ -1,5 +1,5 @@
 .product-modal-content {
-  background-color: #ffffff;
+  background-color: var(--bg-color);
   border-radius: 8px;
   width: 100%;
   max-width: 500px;
@@ -7,6 +7,7 @@
   overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   font-family: var(--font-family, 'JetBrains Mono', monospace);
+  border: 1px solid var(--border-color);
 }
 
 .border-none {

@@ -1,0 +1,132 @@
+.modules-screen {
+  padding: 1rem;
+}
+
+.modules-header {
+  margin-bottom: 2rem;
+}
+
+.modules-title {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+}
+
+.modules-layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+}
+
+.modules-form-card {
+  background: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  height: fit-content;
+}
+
+.modules-form-card h2, .modules-list h2 {
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+}
+
+.image-upload-area {
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.image-upload-area:hover {
+  border-color: var(--primary-color);
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-muted);
+  gap: 1rem;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.checkbox-group {
+  margin-top: 1rem;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.module-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.module-image-wrapper {
+  height: 150px;
+  width: 100%;
+}
+
+.module-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.module-info {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.module-info h3 {
+  color: var(--primary-color);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+}
+
+.status-badge.active {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.status-badge.inactive {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+@media (max-width: 1024px) {
+  .modules-layout {
+    grid-template-columns: 1fr;
+  }
+}

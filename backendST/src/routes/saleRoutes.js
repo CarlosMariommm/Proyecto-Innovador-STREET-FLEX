@@ -7,4 +7,8 @@ router.route('/')
   .post(saleController.createSale)
   .get(saleController.getSales);
 
+// Pedidos de un cliente específico
+router.get('/client/:clientId', saleController.getSalesByClient);
+
 export default router;
+

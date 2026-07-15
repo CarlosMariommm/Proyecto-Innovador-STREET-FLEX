@@ -17,5 +17,13 @@ export const clientService = {
   getProfile: async () => {
     const response = await api.get('/clients/profile');
     return response.data;
+  },
+  getClients: async () => {
+    const response = await api.get('/clients');
+    return response.data;
+  },
+  deleteClient: async (id) => {
+    const response = await api.delete(`/clients/${id}`);
+    return response.data;
   }
 };

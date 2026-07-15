@@ -9,8 +9,8 @@ const generateToken = (res, adminId) => {
 
   res.cookie('jwt', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== 'development', // Usa secure en prod
-    sameSite: 'strict', // Previene ataques CSRF
+    secure: process.env.NODE_ENV === 'production', // Usa secure SOLO en prod real
+    sameSite: 'lax', // Permite testing local y móvil
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 días
   });
 };

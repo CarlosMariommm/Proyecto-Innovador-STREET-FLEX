@@ -3,18 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/web/Header';
 import Sidebar from '../../components/web/Sidebar';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
 import { shopService } from '../../api/shopService';
 import './ReceiptScreen.css';
 
 const ReceiptScreen = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { cart, getCartTotal, clearCart } = useCart();
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   
-  const clientInfo = JSON.parse(localStorage.getItem('clientInfo') || '{}');
-  
   const [addressData, setAddressData] = useState({
-    phone: clientInfo.phone_number || '',
+    phone: user?.phone_number || '',
     city: 'New York City',
     address: '100 Main St',
     postalCode: '10001'
@@ -24,13 +26,13 @@ const ReceiptScreen = () => {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    if (!clientInfo._id) {
+    if (!user || user.role !== 'client') {
       navigate('/login', { replace: true });
     }
     if (cart.length === 0 && !success) {
       navigate('/cart', { replace: true });
     }
-  }, [clientInfo, cart, navigate, success]);
+  }, [user, cart, navigate, success]);
 
   const handleInputChange = (e) => {
     setAddressData({ ...addressData, [e.target.name]: e.target.value });
@@ -47,10 +49,10 @@ const ReceiptScreen = () => {
         price_unit: item.product.price
       }));
 
-      // 1. Crear el carrito en la DB
+      // 1. Crear el carrito en la DB (o usar el endpoint existente)
       const cartResponse = await shopService.createShoppingCar({
         products: productsPayload,
-        id_client: clientInfo._id,
+        id_client: user._id,
         total: total,
         discount: 0,
         total_w_discount: total
@@ -72,10 +74,11 @@ const ReceiptScreen = () => {
       // 3. Éxito
       clearCart();
       setSuccess(true);
+      showToast("Orden confirmada con éxito", "success");
 
     } catch (error) {
       console.error("Error creating order:", error);
-      alert("There was an error processing your order.");
+      showToast("There was an error processing your order.", "error");
     } finally {
       setLoading(false);
     }
@@ -88,7 +91,7 @@ const ReceiptScreen = () => {
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="receipt-main" style={{ textAlign: 'center', marginTop: '4rem' }}>
           <h1 className="receipt-title" style={{ color: '#4CAF50' }}>ORDER CONFIRMED</h1>
-          <p style={{ color: 'white', marginTop: '1rem', fontSize: '1.2rem' }}>
+          <p style={{ color: 'var(--primary-color)', marginTop: '1rem', fontSize: '1.2rem' }}>
             Thank you for your purchase! Your order is being processed.
           </p>
           <button 
@@ -131,7 +134,7 @@ const ReceiptScreen = () => {
               value={addressData.phone} 
               onChange={handleInputChange}
               className="receipt-input"
-              style={{ background: 'transparent', border: '1px solid #333', color: 'white', padding: '0.5rem', width: '100%', marginTop: '0.5rem' }}
+              style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--primary-color)', padding: '0.5rem', width: '100%', marginTop: '0.5rem' }}
             />
           </div>
           
@@ -143,7 +146,7 @@ const ReceiptScreen = () => {
               value={addressData.city} 
               onChange={handleInputChange}
               className="receipt-input"
-              style={{ background: 'transparent', border: '1px solid #333', color: 'white', padding: '0.5rem', width: '100%', marginTop: '0.5rem' }}
+              style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--primary-color)', padding: '0.5rem', width: '100%', marginTop: '0.5rem' }}
             />
           </div>
           
@@ -155,7 +158,7 @@ const ReceiptScreen = () => {
               value={addressData.address} 
               onChange={handleInputChange}
               className="receipt-input"
-              style={{ background: 'transparent', border: '1px solid #333', color: 'white', padding: '0.5rem', width: '100%', marginTop: '0.5rem' }}
+              style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--primary-color)', padding: '0.5rem', width: '100%', marginTop: '0.5rem' }}
             />
           </div>
           
@@ -167,7 +170,7 @@ const ReceiptScreen = () => {
               value={addressData.postalCode} 
               onChange={handleInputChange}
               className="receipt-input"
-              style={{ background: 'transparent', border: '1px solid #333', color: 'white', padding: '0.5rem', width: '100%', marginTop: '0.5rem' }}
+              style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--primary-color)', padding: '0.5rem', width: '100%', marginTop: '0.5rem' }}
             />
           </div>
         </div>
@@ -194,7 +197,7 @@ const ReceiptScreen = () => {
             className="btn-buy" 
             onClick={handleConfirmOrder}
             disabled={loading}
-            style={{ width: '100%', padding: '1rem', background: 'white', color: 'black', fontWeight: 'bold' }}
+            style={{ width: '100%', padding: '1rem', background: 'var(--primary-color)', color: 'var(--bg-color)', fontWeight: 'bold' }}
           >
             {loading ? 'PROCESSING...' : 'CONFIRM ORDER & SIMULATE PAYMENT'}
           </button>

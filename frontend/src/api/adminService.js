@@ -16,5 +16,9 @@ export const adminService = {
   getProfile: async () => {
     const response = await api.get('/admins/profile');
     return response.data;
+  },
+  updateProfile: async (data) => {
+    const response = await api.put('/admins/profile', data);
+    return response.data;
   }
 };

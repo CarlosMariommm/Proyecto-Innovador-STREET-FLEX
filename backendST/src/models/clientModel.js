@@ -11,6 +11,9 @@ const clientSchema = new mongoose.Schema(
     image: { type: String },
     active: { type: Boolean, default: true },
     verified: { type: Boolean, default: false },
+    verificationToken: { type: String },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
   },
   { timestamps: true, strict: false }
 );

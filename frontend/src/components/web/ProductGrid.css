@@ -29,3 +29,45 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* New Module/Category Navigation Styles */
+.module-header-bar {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.module-main-title {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.module-categories-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.cat-pill {
+  padding: 0.5rem 1.2rem;
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.cat-pill:hover {
+  border-color: var(--primary-color);
+}
+
+.cat-pill.active {
+  background-color: var(--primary-color);
+  color: var(--bg-color);
+  border-color: var(--primary-color);
+}
