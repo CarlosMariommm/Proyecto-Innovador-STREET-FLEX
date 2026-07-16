@@ -14,8 +14,10 @@ const ProductDetailsScreen = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { user } = useAuth();
+  const { user, toggleFavorite } = useAuth();
   const { showToast } = useToast();
+
+  const isFavorite = user?.role === 'client' && user.favorites?.includes(id);
   
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -255,7 +257,23 @@ const ProductDetailsScreen = () => {
             
             <div className="product-actions">
               <button className="add-bag-btn" onClick={handleAddToCart}>ADD TO BAG</button>
-              <button className="add-favorites-btn">ADD TO FAVORITES</button>
+              <button 
+                className={`add-favorites-btn ${isFavorite ? 'active' : ''}`}
+                onClick={async () => {
+                  if (!user || user.role !== 'client') {
+                    showToast('Por favor inicia sesión para guardar favoritos', 'error');
+                    navigate('/login');
+                    return;
+                  }
+                  const ok = await toggleFavorite(id);
+                  if (ok) {
+                    if (isFavorite) showToast('Eliminado de favoritos', 'success');
+                    else showToast('¡Guardado en favoritos!', 'success');
+                  }
+                }}
+              >
+                {isFavorite ? '♥ SAVED' : 'ADD TO FAVORITES'}
+              </button>
             </div>
           </div>
         </div>

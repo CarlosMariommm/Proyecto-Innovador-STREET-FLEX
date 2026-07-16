@@ -98,8 +98,32 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem(STORAGE_KEY);
   };
 
+  const toggleFavorite = async (productId) => {
+    if (!user || user.role !== 'client') return false;
+    const isFav = user.favorites?.includes(productId);
+    try {
+      if (isFav) {
+        await api.delete(`/clients/favorites/${productId}`);
+        setUser(prev => ({
+          ...prev,
+          favorites: prev.favorites.filter(id => id !== productId)
+        }));
+      } else {
+        await api.post('/clients/favorites', { productId });
+        setUser(prev => ({
+          ...prev,
+          favorites: [...(prev.favorites || []), productId]
+        }));
+      }
+      return true;
+    } catch (e) {
+      console.error('Toggle fav error', e);
+      return false;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, loginAdmin, loginClient, logout, checkAuth }}>
+    <AuthContext.Provider value={{ user, loading, loginAdmin, loginClient, logout, checkAuth, toggleFavorite }}>
       {children}
     </AuthContext.Provider>
   );

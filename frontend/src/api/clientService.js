@@ -29,5 +29,17 @@ export const clientService = {
   deleteClient: async (id) => {
     const response = await api.delete(`/clients/${id}`);
     return response.data;
+  },
+  getFavorites: async () => {
+    const response = await api.get('/clients/favorites');
+    return response.data;
+  },
+  addFavorite: async (productId) => {
+    const response = await api.post('/clients/favorites', { productId });
+    return response.data;
+  },
+  removeFavorite: async (productId) => {
+    const response = await api.delete(`/clients/favorites/${productId}`);
+    return response.data;
   }
 };

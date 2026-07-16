@@ -67,6 +67,7 @@ clientController.loginClient = async (req, res) => {
         email: client.email,
         full_name: client.full_name,
         phone_number: client.phone_number,
+        favorites: client.favorites || [],
         image: client.image
       });
     } else {
@@ -93,7 +94,7 @@ clientController.getClientProfile = async (req, res) => {
     // Voy a cambiar authMiddleware para que decodifique generico?
     // En realidad, authMiddleware busca Admin.findById. Necesitamos un protectClient.
     // Lo manejaremos ahora asumiendo un protect genérico o busqueda por ID.
-    const client = await Client.findById(req.user._id);
+    const client = await Client.findById(req.client._id);
 
     if (client) {
       res.json({
@@ -102,6 +103,7 @@ clientController.getClientProfile = async (req, res) => {
         email: client.email,
         full_name: client.full_name,
         phone_number: client.phone_number,
+        favorites: client.favorites || [],
         image: client.image
       });
     } else {
@@ -135,7 +137,7 @@ clientController.deleteClient = async (req, res) => {
 clientController.addFavorite = async (req, res) => {
   try {
     const { productId } = req.body;
-    const client = await Client.findById(req.user._id); // Assuming protectClient sets req.user
+    const client = await Client.findById(req.client._id); // Assuming protectClient sets req.client
 
     if (!client) return res.status(404).json({ message: 'Client not found' });
 
@@ -152,7 +154,7 @@ clientController.addFavorite = async (req, res) => {
 clientController.removeFavorite = async (req, res) => {
   try {
     const { productId } = req.params;
-    const client = await Client.findById(req.user._id);
+    const client = await Client.findById(req.client._id);
 
     if (!client) return res.status(404).json({ message: 'Client not found' });
 
@@ -167,7 +169,10 @@ clientController.removeFavorite = async (req, res) => {
 
 clientController.getFavorites = async (req, res) => {
   try {
-    const client = await Client.findById(req.user._id).populate('favorites');
+    const client = await Client.findById(req.client._id).populate({
+      path: 'favorites',
+      populate: { path: 'category', select: 'name' }
+    });
 
     if (!client) return res.status(404).json({ message: 'Client not found' });
 

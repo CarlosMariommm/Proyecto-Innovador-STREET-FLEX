@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { productService } from '../../api/productService';
 import { categoryService } from '../../api/categoryService';
 import { moduleService } from '../../api/moduleService';
+import { supplierService } from '../../api/supplierService';
 import './SupplierModal.css'; // Reuse same modal styles
 
 const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) => {
@@ -11,6 +12,7 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) =
     price: '',
     id_module: '',
     category: '',
+    supplier: '',
     stock: '',
     units: '',
     seson: '',
@@ -24,6 +26,7 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) =
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [modules, setModules] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -42,12 +45,20 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) =
         })
         .catch(err => console.error('Error fetching modules:', err));
 
+      supplierService.getSuppliers()
+        .then(data => {
+          const list = Array.isArray(data) ? data : data.data || [];
+          setSuppliers(list);
+        })
+        .catch(err => console.error('Error fetching suppliers:', err));
+
       if (initialData) {
         setFormData({
           product_name: initialData.product_name || '',
           price: initialData.price || '',
           id_module: initialData.id_module?._id || initialData.id_module || '',
           category: initialData.category?._id || initialData.category || '',
+          supplier: initialData.supplier?._id || initialData.supplier || '',
           stock: initialData.stock || '',
           units: initialData.units || '',
           seson: initialData.seson || '',
@@ -60,7 +71,7 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) =
         }
       } else {
         setFormData({
-          product_name: '', price: '', id_module: '', category: '', stock: '',
+          product_name: '', price: '', id_module: '', category: '', supplier: '', stock: '',
           units: '', seson: '', material: '', care_instructions: '', shipping_returns: ''
         });
         setImagePreview(null);
@@ -104,7 +115,7 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) =
       }
 
       setFormData({
-        product_name: '', price: '', id_module: '', category: '', stock: '',
+        product_name: '', price: '', id_module: '', category: '', supplier: '', stock: '',
         units: '', seson: '', material: '', care_instructions: '', shipping_returns: ''
       });
       setImageFile(null);
@@ -191,6 +202,16 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) =
                 <option value="">-- Select a category --</option>
                 {categories.map(cat => (
                   <option key={cat._id} value={cat._id}>{cat.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-row">
+              <label>Supplier</label>
+              <select name="supplier" value={formData.supplier} onChange={handleChange} className="form-select">
+                <option value="">-- Select a supplier --</option>
+                {suppliers.map(sup => (
+                  <option key={sup._id} value={sup._id}>{sup.company_name || sup.name}</option>
                 ))}
               </select>
             </div>

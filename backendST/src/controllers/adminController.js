@@ -105,6 +105,7 @@ adminController.updateAdminProfile = async (req, res) => {
 
     if (admin) {
       admin.full_name = req.body.full_name || admin.full_name;
+      admin.username = req.body.username || admin.username;
 
       const updatedAdmin = await admin.save();
 

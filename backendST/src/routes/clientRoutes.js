@@ -8,10 +8,6 @@ router.route('/')
   .post(clientController.createClient)
   .get(clientController.getClients);
 
-router.route('/:id')
-  .put(clientController.updateClient)
-  .delete(clientController.deleteClient);
-
 router.post('/login', clientController.loginClient);
 router.post('/logout', clientController.logoutClient);
 
@@ -29,5 +25,10 @@ router.route('/favorites')
 
 router.route('/favorites/:productId')
   .delete(protectClient, clientController.removeFavorite);
+
+// /:id MUST be last — otherwise it captures /profile, /favorites, /login, etc.
+router.route('/:id')
+  .put(clientController.updateClient)
+  .delete(clientController.deleteClient);
 
 export default router;

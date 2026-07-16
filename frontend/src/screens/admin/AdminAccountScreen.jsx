@@ -14,6 +14,7 @@ const AdminAccountScreen = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(user?.full_name || '');
+  const [newUsername, setNewUsername] = useState(user?.username || '');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -24,6 +25,7 @@ const AdminAccountScreen = () => {
         if (profile && profile.email) {
             setAdmin(profile);
             setNewName(profile.full_name || '');
+            setNewUsername(profile.username || '');
         }
       } catch (error) {
         console.error("Error fetching admin data:", error);
@@ -47,12 +49,14 @@ const AdminAccountScreen = () => {
 
   const handleEditClick = () => {
     setNewName(admin?.full_name || '');
+    setNewUsername(admin?.username || '');
     setIsEditing(true);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
     setNewName(admin?.full_name || '');
+    setNewUsername(admin?.username || '');
   };
 
   const handleSave = async () => {
@@ -62,7 +66,10 @@ const AdminAccountScreen = () => {
     }
     try {
       setSaving(true);
-      const data = await adminService.updateProfile({ full_name: newName.trim() });
+      const data = await adminService.updateProfile({ 
+        full_name: newName.trim(), 
+        username: newUsername.trim() 
+      });
       const updated = data.data ? data.data : data;
       setAdmin(updated);
       setIsEditing(false);
@@ -117,8 +124,28 @@ const AdminAccountScreen = () => {
               )}
             </div>
             <div className="account-form-group">
+              <label>USERNAME</label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  className="account-edit-input"
+                  value={newUsername}
+                  onChange={e => setNewUsername(e.target.value)}
+                />
+              ) : (
+                <div className="readonly-input">{admin?.username || 'N/A'}</div>
+              )}
+            </div>
+          </div>
+          
+          <div className="account-form-row">
+            <div className="account-form-group">
               <label>EMAIL</label>
               <div className="readonly-input">{admin?.email || 'N/A'}</div>
+            </div>
+            <div className="account-form-group">
+              <label>ROLE</label>
+              <div className="readonly-input">Administrator</div>
             </div>
           </div>
 
@@ -134,14 +161,6 @@ const AdminAccountScreen = () => {
               <button className="btn-text" onClick={handleEditClick}>EDIT</button>
             )}
           </div>
-          
-          <div className="account-form-row mt-6">
-            <div className="account-form-group full-width">
-              <label>ROLE</label>
-              <div className="readonly-input">Administrator</div>
-            </div>
-          </div>
-          
         </div>
       </div>
     </div>
