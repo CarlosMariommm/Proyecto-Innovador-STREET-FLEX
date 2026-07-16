@@ -2,18 +2,23 @@ import React from 'react';
 import { Outlet, NavLink, Navigate, useLocation } from 'react-router-dom';
 import Header from '../../components/web/Header';
 import Sidebar from '../../components/web/Sidebar';
+import { useAuth } from '../../hooks/useAuth';
 import './AccountLayout.css';
 
 const AccountLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const location = useLocation();
+  const { user, loading } = useAuth();
 
-  const clientInfo = localStorage.getItem('clientInfo');
-  if (!clientInfo) {
+  if (loading) {
+    return <div style={{ padding: '100px', textAlign: 'center' }}>Loading account details...</div>;
+  }
+
+  if (!user || user.role !== 'client') {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  const client = JSON.parse(clientInfo);
+  const client = user;
 
   return (
     <div className="account-screen">

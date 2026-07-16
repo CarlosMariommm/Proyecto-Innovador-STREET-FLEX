@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 import { UserCircle } from 'lucide-react';
 import { clientService } from '../../api/clientService';
 import './AccountInformation.css';
@@ -43,13 +44,9 @@ const AccountInformation = () => {
     // TODO: implement profile update if needed
   };
 
+  const { logout } = useAuth();
   const handleLogout = async () => {
-    try {
-      await clientService.logout();
-    } catch (e) {
-      console.error(e);
-    }
-    localStorage.removeItem('clientInfo');
+    await logout();
     navigate('/login');
   };
 

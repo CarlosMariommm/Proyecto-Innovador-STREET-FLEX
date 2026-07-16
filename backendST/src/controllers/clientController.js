@@ -37,6 +37,7 @@ clientController.createClient = async (req, res) => {
         username: client.username,
         email: client.email,
         full_name: client.full_name,
+        phone_number: client.phone_number,
       });
     } else {
       res.status(400).json({ message: "Invalid data" });
@@ -65,6 +66,7 @@ clientController.loginClient = async (req, res) => {
         username: client.username,
         email: client.email,
         full_name: client.full_name,
+        phone_number: client.phone_number,
         image: client.image
       });
     } else {
@@ -99,6 +101,7 @@ clientController.getClientProfile = async (req, res) => {
         username: client.username,
         email: client.email,
         full_name: client.full_name,
+        phone_number: client.phone_number,
         image: client.image
       });
     } else {

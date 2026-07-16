@@ -1,61 +1,68 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api/api';
+import { useToast } from '../../hooks/useToast';
+import './ClientAuthScreen.css';
 
 const ForgotPasswordScreen = () => {
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
-    setError('');
 
     try {
       const res = await api.post('/clients/forgot-password', { email });
-      setMessage(res.data.message);
+      showToast(res.data.message, 'success');
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al solicitar la recuperación');
+      showToast(err.response?.data?.message || 'Error al solicitar la recuperación', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-color)] text-[var(--primary-color)] p-4">
-      <div className="w-full max-w-md p-8 border border-[var(--border-color)]">
-        <h2 className="text-2xl font-light mb-6 uppercase tracking-widest text-center">Recuperar Contraseña</h2>
-        
-        {message && <div className="mb-4 p-3 bg-green-900/20 text-green-500 border border-green-900/50">{message}</div>}
-        {error && <div className="mb-4 p-3 bg-red-900/20 text-red-500 border border-red-900/50">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <label htmlFor="email" className="text-sm font-light uppercase tracking-wider">Correo Electrónico</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="p-3 bg-transparent border border-[var(--border-color)] focus:outline-none focus:border-[var(--primary-color)] transition-colors"
-              required
-            />
+    <div className="client-auth-container">
+      <div className="client-auth-left">
+        <h1 className="client-auth-phrase">
+          YOUR STYLE,<br/>YOUR RULES
+        </h1>
+      </div>
+      
+      <div className="client-auth-right">
+        <div className="client-auth-form-container">
+          <h2 className="client-auth-title">STREET FLEX</h2>
+          
+          <div className="client-auth-header">
+            <h3>Recuperar Contraseña</h3>
+            <p>Ingresa tu correo para recibir las instrucciones.</p>
           </div>
           
-          <button 
-            type="submit" 
-            disabled={loading}
-            className="mt-4 p-3 bg-[var(--primary-color)] text-[var(--bg-color)] uppercase tracking-widest font-bold hover:opacity-80 transition-opacity disabled:opacity-50"
-          >
-            {loading ? 'Enviando...' : 'Enviar enlace'}
-          </button>
-        </form>
+          <form className="client-auth-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="email">Email*</label>
+              <input 
+                type="email" 
+                id="email" 
+                required 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+              />
+            </div>
+            
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Enviando...' : 'Enviar enlace'}
+            </button>
+          </form>
 
-        <div className="mt-6 text-center text-sm font-light text-[var(--accent-color)]">
-          <Link to="/login" className="hover:text-[var(--primary-color)] transition-colors underline underline-offset-4">Volver al inicio de sesión</Link>
+          <p className="toggle-mode" style={{ marginTop: '3rem' }}>
+            ¿Recordaste tu contraseña?
+            <Link to="/login">
+              Volver a iniciar sesión
+            </Link>
+          </p>
         </div>
       </div>
     </div>

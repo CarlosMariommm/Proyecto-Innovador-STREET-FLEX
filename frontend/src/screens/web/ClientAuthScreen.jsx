@@ -39,7 +39,7 @@ const ClientAuthScreen = () => {
         if (result.success) {
           showToast('Bienvenido a Street Flex', 'success');
           // Navigate works with strings or location objects, so we safely pass the string
-          navigate(typeof from === 'string' ? from : '/account', { replace: true });
+          navigate(typeof from === 'string' && from !== '/account' ? from : '/', { replace: true });
         } else {
           showToast(result.message, 'error');
         }
