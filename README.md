@@ -181,6 +181,10 @@ Para acceder al panel administrativo, debes:
 
 ---
 
+## Aplicación Móvil
+
+El proyecto también tiene una app móvil (Expo + React Native) en `movil/`, que consume la misma API de `backendST/`. Ver [`movil/README.md`](movil/README.md) para el detalle de cómo correrla.
+
 ## Equipo de Desarrollo
 - Carlos Mario
 - Andrés Emanuel

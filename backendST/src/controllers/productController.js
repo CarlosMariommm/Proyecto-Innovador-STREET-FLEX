@@ -4,17 +4,28 @@ import Shopping_Car from '../models/shoppingCarModel.js';
 
 const productController = {};
 
+// El formulario del admin manda "Negro, Blanco" como texto (FormData no
+// distingue un arreglo de un string suelto); esto lo vuelve a partir en
+// ['Negro', 'Blanco']. Si ya llega como arreglo (ej. desde un cliente JSON),
+// se deja tal cual.
+const toList = (value) => {
+  if (Array.isArray(value)) return value.map((v) => String(v).trim()).filter(Boolean);
+  if (typeof value === 'string') return value.split(',').map((v) => v.trim()).filter(Boolean);
+  return [];
+};
+
 productController.createProduct = async (req, res) => {
   try {
-    const { product_name, price, description, color, size, stock, material, units, category, supplier, active, seson } = req.body;
-    
+    const { product_name, price, description, colors, sizes, stock, material, units, category, supplier, active, seson } = req.body;
+
     let image = req.body.image || '';
     if (req.file && req.file.path) {
       image = req.file.path;
     }
 
     const product = await Product.create({
-      product_name, price, description, color, size, stock, material, units, category, supplier, image, active, seson
+      product_name, price, description, colors: toList(colors), sizes: toList(sizes),
+      stock, material, units, category, supplier, image, active, seson
     });
 
     if (product) {
@@ -114,12 +125,13 @@ productController.addReview = async (req, res) => {
 productController.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { product_name, price, description, color, size, stock, material, units, category, supplier, active, seson } = req.body;
-    
+    const { product_name, price, description, colors, sizes, stock, material, units, category, supplier, active, seson } = req.body;
+
     let updateData = {
-      product_name, price, description, color, size, stock, material, units, category, supplier, active, seson
+      product_name, price, description, colors: toList(colors), sizes: toList(sizes),
+      stock, material, units, category, supplier, active, seson
     };
-    
+
     if (req.file && req.file.path) {
       updateData.image = req.file.path;
     }

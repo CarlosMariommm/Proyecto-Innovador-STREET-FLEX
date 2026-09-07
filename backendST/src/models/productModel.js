@@ -5,8 +5,10 @@ const productSchema = new mongoose.Schema(
     product_name: { type: String, required: true },
     price: { type: Number, required: true },
     description: { type: String },
-    color: { type: String },
-    size: { type: String },
+    // Un producto puede venir en varios colores/tallas (una remera con S/M/L,
+    // por ejemplo) — de ahi el arreglo en vez de un solo valor.
+    colors: [{ type: String }],
+    sizes: [{ type: String }],
     stock: { type: Number, default: 0 },
     material: { type: String },
     care_instructions: { type: String },

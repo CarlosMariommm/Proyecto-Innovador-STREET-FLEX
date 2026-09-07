@@ -13,6 +13,8 @@ router.post('/logout', clientController.logoutClient);
 
 // Nuevas rutas para verificación y recuperación
 router.get('/verify/:token', clientController.verifyEmail);
+router.post('/verify-code', clientController.verifyCode);
+router.post('/resend-code', clientController.resendVerificationCode);
 router.post('/forgot-password', clientController.forgotPassword);
 router.post('/reset-password/:token', clientController.resetPassword);
 

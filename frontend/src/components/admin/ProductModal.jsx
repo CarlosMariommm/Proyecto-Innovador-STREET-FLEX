@@ -18,7 +18,9 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) =
     seson: '',
     material: '',
     care_instructions: '',
-    shipping_returns: ''
+    shipping_returns: '',
+    colors: '',
+    sizes: ''
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -64,7 +66,9 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) =
           seson: initialData.seson || '',
           material: initialData.material || '',
           care_instructions: initialData.care_instructions || '',
-          shipping_returns: initialData.shipping_returns || ''
+          shipping_returns: initialData.shipping_returns || '',
+          colors: (initialData.colors || []).join(', '),
+          sizes: (initialData.sizes || []).join(', ')
         });
         if (initialData.image) {
           setImagePreview(initialData.image);
@@ -72,7 +76,8 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) =
       } else {
         setFormData({
           product_name: '', price: '', id_module: '', category: '', supplier: '', stock: '',
-          units: '', seson: '', material: '', care_instructions: '', shipping_returns: ''
+          units: '', seson: '', material: '', care_instructions: '', shipping_returns: '',
+          colors: '', sizes: ''
         });
         setImagePreview(null);
         setImageFile(null);
@@ -116,7 +121,8 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) =
 
       setFormData({
         product_name: '', price: '', id_module: '', category: '', supplier: '', stock: '',
-        units: '', seson: '', material: '', care_instructions: '', shipping_returns: ''
+        units: '', seson: '', material: '', care_instructions: '', shipping_returns: '',
+        colors: '', sizes: ''
       });
       setImageFile(null);
       setImagePreview(null);
@@ -232,6 +238,18 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, initialData = null }) =
               <label>Season</label>
               <input type="text" name="seson" value={formData.seson}
                 onChange={handleChange} placeholder="E.g. Summer" />
+            </div>
+
+            <div className="form-row">
+              <label>Colors</label>
+              <input type="text" name="colors" value={formData.colors}
+                onChange={handleChange} placeholder="E.g. Black, White, Blue (comma separated)" />
+            </div>
+
+            <div className="form-row">
+              <label>Sizes</label>
+              <input type="text" name="sizes" value={formData.sizes}
+                onChange={handleChange} placeholder="E.g. S, M, L, XL (comma separated)" />
             </div>
 
             <div className="form-row" style={{ alignItems: 'flex-start', paddingTop: '4px' }}>

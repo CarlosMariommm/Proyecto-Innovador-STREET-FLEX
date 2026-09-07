@@ -26,6 +26,10 @@ app.use(cors({
             'http://localhost:5173',
             'http://localhost:5174',
             'http://localhost:5175',
+            // expo start --web (movil/): puerto por defecto de Metro y su
+            // primer alterno si el 8081 ya esta ocupado.
+            'http://localhost:8081',
+            'http://localhost:8082',
         ].filter(Boolean);
         if (!origin || allowed.includes(origin)) {
             callback(null, true);

@@ -12,6 +12,11 @@ const clientSchema = new mongoose.Schema(
     active: { type: Boolean, default: true },
     verified: { type: Boolean, default: false },
     verificationToken: { type: String },
+    // Codigo de 6 digitos que se manda por correo para verificar la cuenta
+    // desde la app movil (fetch en React Native no puede seguir el link que
+    // usa la web, asi que necesita algo que se pueda tipear a mano).
+    verificationCode: { type: String },
+    verificationCodeExpires: { type: Date },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
   },

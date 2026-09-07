@@ -2,8 +2,19 @@ import jwt from 'jsonwebtoken';
 import Admin from '../models/adminModel.js';
 import Client from '../models/clientModel.js';
 
+// La app movil no tiene cookies httpOnly (fetch en React Native no las
+// administra), asi que manda el token por header Authorization: Bearer.
+// La cookie sigue siendo la via principal para el frontend web.
+const bearerToken = (req) => {
+  const header = req.headers.authorization;
+  if (header && header.startsWith('Bearer ')) {
+    return header.slice(7);
+  }
+  return null;
+};
+
 const protect = async (req, res, next) => {
-  let token = req.cookies.jwt;
+  let token = req.cookies.jwt || bearerToken(req);
 
   if (token) {
     try {
@@ -21,7 +32,7 @@ const protect = async (req, res, next) => {
 };
 
 const protectClient = async (req, res, next) => {
-  let token = req.cookies.jwt;
+  let token = req.cookies.jwt || bearerToken(req);
 
   if (token) {
     try {

@@ -7,6 +7,10 @@ const shoppingCarSchema = new mongoose.Schema(
         id_product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
         amount: { type: Number },
         subtotal: { type: Number },
+        // La talla/color elegidos en el detalle del producto, para que el
+        // pedido recuerde cual variante se compro (ver ProductDetailsScreen).
+        size: { type: String },
+        color: { type: String },
       }
     ],
     id_client: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },

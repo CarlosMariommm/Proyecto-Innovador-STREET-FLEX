@@ -12,7 +12,8 @@ const CategoryModal = ({ isOpen, onClose, onCategorySaved, initialData = null })
     description: '',
     supplier: '',
     id_module: '',
-    active: true
+    active: true,
+    subcategories: ''
   });
   
   const [suppliers, setSuppliers] = useState([]);
@@ -27,10 +28,11 @@ const CategoryModal = ({ isOpen, onClose, onCategorySaved, initialData = null })
           description: initialData.description || '',
           supplier: initialData.supplier?._id || initialData.supplier || '',
           id_module: initialData.id_module?._id || initialData.id_module || '',
-          active: initialData.active !== undefined ? initialData.active : true
+          active: initialData.active !== undefined ? initialData.active : true,
+          subcategories: (initialData.subcategories || []).join(', ')
         });
       } else {
-        setFormData({ name: '', description: '', supplier: '', id_module: '', active: true });
+        setFormData({ name: '', description: '', supplier: '', id_module: '', active: true, subcategories: '' });
       }
       fetchSuppliers();
       fetchModules();
@@ -132,6 +134,17 @@ const CategoryModal = ({ isOpen, onClose, onCategorySaved, initialData = null })
                 <option key={s._id} value={s._id}>{s.supp_name}</option>
               ))}
             </select>
+          </div>
+
+          <div className="form-group">
+            <label>Subcategories</label>
+            <input
+              type="text"
+              name="subcategories"
+              value={formData.subcategories}
+              onChange={handleChange}
+              placeholder="E.g. Jeans, Hoodies, Tops (comma separated)"
+            />
           </div>
 
           <div className="form-group">
