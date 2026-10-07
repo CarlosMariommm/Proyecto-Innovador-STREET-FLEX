@@ -8,6 +8,9 @@ const clientSchema = new mongoose.Schema(
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
     full_name: { type: String, required: true },
     phone_number: { type: String },
+    // Edad en años. Se valida (entero entre 13 y 100) al registrar y al editar
+    // el perfil, tanto en la app movil como aqui en el servidor.
+    age: { type: Number, min: 13, max: 100 },
     image: { type: String },
     active: { type: Boolean, default: true },
     verified: { type: Boolean, default: false },
@@ -19,6 +22,10 @@ const clientSchema = new mongoose.Schema(
     verificationCodeExpires: { type: Date },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
+    // Lo mismo que el token de arriba pero como codigo de 6 digitos, para
+    // recuperar la contrasena desde la app movil (que no puede seguir un link).
+    resetCode: { type: String },
+    resetCodeExpires: { type: Date },
   },
   { timestamps: true, strict: false }
 );

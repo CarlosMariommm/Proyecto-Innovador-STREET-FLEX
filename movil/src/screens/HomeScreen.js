@@ -28,6 +28,7 @@ import { fetchProducts } from '../api/productApi';
 import { fetchCategories } from '../api/categoryApi';
 import { fetchBanners } from '../api/bannerApi';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../hooks/useAuth';
 import ProductCard from '../components/ui/ProductCard';
 import LoadingIndicator from '../components/ui/LoadingIndicator';
 import CategorySidebar from '../components/ui/CategorySidebar';
@@ -79,6 +80,7 @@ const BannerCarousel = ({ banners, pageWidth }) => {
 const HomeScreen = ({ onOpenProduct, onOpenCart }) => {
   const { top } = useSafeAreaInsets();
   const { itemCount } = useCart();
+  const { user, isAuthenticated } = useAuth();
   const { width } = useWindowDimensions();
 
   const [products, setProducts] = useState([]);
@@ -188,6 +190,15 @@ const HomeScreen = ({ onOpenProduct, onOpenCart }) => {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.text} />}
         ListHeaderComponent={
           <View>
+            {isAuthenticated && !!user?.full_name && (
+              <View style={styles.welcome}>
+                <Text style={styles.welcomeLabel}>BIENVENIDO DE NUEVO</Text>
+                <Text style={styles.welcomeName} numberOfLines={1}>
+                  Hola, {user.full_name}
+                </Text>
+              </View>
+            )}
+
             <BannerCarousel banners={banners} pageWidth={width} />
 
             <View style={styles.searchWrapper}>
@@ -269,6 +280,22 @@ const styles = StyleSheet.create({
     color: COLORS.background,
     fontSize: 8.5,
     fontWeight: '700',
+  },
+  welcome: {
+    paddingHorizontal: SIDE_PADDING,
+    marginBottom: 18,
+  },
+  welcomeLabel: {
+    fontSize: 10.5,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    color: COLORS.textMuted,
+    marginBottom: 4,
+  },
+  welcomeName: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: COLORS.text,
   },
   bannerSection: {
     marginBottom: 26,

@@ -20,6 +20,7 @@ import { MailCheck } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { verifyRegistrationCode, resendVerificationCode } from '../api/authApi';
 import { useAuth } from '../hooks/useAuth';
+import { buildSessionUser } from '../utils/sessionUser';
 import Button from '../components/ui/Button';
 import TextField from '../components/ui/TextField';
 
@@ -64,15 +65,7 @@ const VerifyCodeScreen = ({ email, sendOnMount = false, onGoToLogin }) => {
       setLoading(true);
       setError('');
       const res = await verifyRegistrationCode({ email, code });
-      login(res.token, {
-        _id: res._id,
-        username: res.username,
-        email: res.email,
-        full_name: res.full_name,
-        phone_number: res.phone_number,
-        favorites: res.favorites || [],
-        image: res.image,
-      });
+      login(res.token, buildSessionUser(res));
     } catch (err) {
       setError(err.message || 'No se pudo verificar el codigo');
     } finally {

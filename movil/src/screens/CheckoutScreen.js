@@ -11,7 +11,13 @@ import { COLORS } from '../theme/colors';
 import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../context/CartContext';
 import { createSale } from '../api/saleApi';
-import { validateForm, validatePhone, validateRequired, hasNoErrors } from '../utils/validations';
+import {
+  validateForm,
+  validateNonNegativeNumber,
+  validatePhone,
+  validateRequired,
+  hasNoErrors,
+} from '../utils/validations';
 import { formatCurrency } from '../utils/formatCurrency';
 import BackHeader from '../components/ui/BackHeader';
 import Button from '../components/ui/Button';
@@ -21,7 +27,7 @@ const PAYMENT_METHOD = 'Simulado (Wompi)';
 
 const CheckoutScreen = ({ onBack, onConfirmed }) => {
   const { user } = useAuth();
-  const { items, total, syncToBackend, clearCart } = useCart();
+  const { items, total, saveOrderCart, clearCart } = useCart();
 
   const [values, setValues] = useState({
     phone: user?.phone_number || '',
@@ -39,10 +45,17 @@ const CheckoutScreen = ({ onBack, onConfirmed }) => {
   };
 
   const handleConfirm = async () => {
+    // Un pedido sin productos no se puede hacer (tambien lo rechaza el servidor).
+    if (items.length === 0) {
+      setServerError('Tu carrito esta vacio. Agrega productos antes de pagar.');
+      return;
+    }
+
     const found = validateForm(values, {
       phone: validatePhone,
       city: validateRequired('La ciudad'),
       address: validateRequired('La direccion'),
+      postalCode: validateNonNegativeNumber('El codigo postal'),
     });
     setErrors(found);
     if (!hasNoErrors(found)) return;
@@ -50,9 +63,9 @@ const CheckoutScreen = ({ onBack, onConfirmed }) => {
     try {
       setLoading(true);
       setServerError('');
-      const cart = await syncToBackend();
+      const cartId = await saveOrderCart();
       const sale = await createSale({
-        id_shoppig_car: cart._id,
+        id_shoppig_car: cartId,
         delivery_addres: values.address.trim(),
         city: values.city.trim(),
         payment_method: PAYMENT_METHOD,
@@ -95,9 +108,12 @@ const CheckoutScreen = ({ onBack, onConfirmed }) => {
             error={errors.address}
           />
           <TextField
-            label="Codigo postal"
+            label="Codigo postal (opcional)"
             value={values.postalCode}
             onChangeText={handleChange('postalCode')}
+            error={errors.postalCode}
+            keyboardType="number-pad"
+            maxLength={8}
           />
 
           <Text style={styles.sectionTitle}>Productos</Text>

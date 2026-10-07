@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { Package } from 'lucide-react-native';
@@ -8,19 +8,28 @@ import { fetchSalesByClient } from '../../api/saleApi';
 import { useAuth } from '../../hooks/useAuth';
 import { formatCurrency } from '../../utils/formatCurrency';
 import LoadingIndicator from '../../components/ui/LoadingIndicator';
+import OrderStatusTag from '../../components/ui/OrderStatusTag';
 
 const orderTotal = (sale) =>
   (sale.id_shoppig_car?.products || []).reduce((sum, p) => sum + (Number(p.subtotal) || 0), 0);
 
-const OrderCard = ({ sale }) => {
+const OrderCard = ({ sale, onPress }) => {
   const products = sale.id_shoppig_car?.products || [];
   const date = sale.createdAt ? new Date(sale.createdAt).toLocaleDateString() : '';
 
   return (
-    <View style={styles.card}>
+    <Pressable
+      onPress={() => onPress(sale)}
+      accessibilityRole="button"
+      accessibilityLabel={`Ver detalle del pedido ${String(sale._id).slice(-6).toUpperCase()}`}
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+    >
       <View style={styles.cardHeader}>
-        <Text style={styles.orderId}>Pedido #{String(sale._id).slice(-6).toUpperCase()}</Text>
-        <Text style={styles.orderDate}>{date}</Text>
+        <View>
+          <Text style={styles.orderId}>Pedido #{String(sale._id).slice(-6).toUpperCase()}</Text>
+          <Text style={styles.orderDate}>{date}</Text>
+        </View>
+        <OrderStatusTag status={sale.status || 'Pendiente'} />
       </View>
 
       {products.map((p, i) => {
@@ -34,16 +43,14 @@ const OrderCard = ({ sale }) => {
       })}
 
       <View style={styles.cardFooter}>
-        <Text style={styles.address} numberOfLines={1}>
-          {sale.delivery_addres}, {sale.city}
-        </Text>
+        <Text style={styles.detailLink}>Ver detalle</Text>
         <Text style={styles.total}>{formatCurrency(orderTotal(sale))}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
-const OrderHistoryScreen = () => {
+const OrderHistoryScreen = ({ onOpenOrder }) => {
   const { top } = useSafeAreaInsets();
   const { user } = useAuth();
   const [orders, setOrders] = useState([]);
@@ -64,6 +71,8 @@ const OrderHistoryScreen = () => {
     }
   }, [user?._id]);
 
+  // Cada vez que este apartado gana foco (tambien al volver del detalle de un
+  // pedido cancelado), no solo al montarse: asi el estado nunca queda viejo.
   useFocusEffect(
     useCallback(() => {
       load();
@@ -82,7 +91,7 @@ const OrderHistoryScreen = () => {
         data={orders}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.list}
-        renderItem={({ item }) => <OrderCard sale={item} />}
+        renderItem={({ item }) => <OrderCard sale={item} onPress={onOpenOrder} />}
         ListEmptyComponent={
           !error ? (
             <View style={styles.empty}>
@@ -117,7 +126,6 @@ const styles = StyleSheet.create({
   list: {
     paddingHorizontal: 20,
     paddingBottom: 24,
-    gap: 14,
   },
   card: {
     borderWidth: 1,
@@ -126,10 +134,14 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 14,
   },
+  cardPressed: {
+    opacity: 0.75,
+  },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    alignItems: 'flex-start',
+    marginBottom: 10,
   },
   orderId: {
     fontSize: 13,
@@ -139,6 +151,7 @@ const styles = StyleSheet.create({
   orderDate: {
     fontSize: 12,
     color: COLORS.textMuted,
+    marginTop: 2,
   },
   item: {
     fontSize: 12.5,
@@ -154,11 +167,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
   },
-  address: {
-    flex: 1,
-    fontSize: 12,
-    color: COLORS.textMuted,
-    marginRight: 8,
+  detailLink: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: COLORS.text,
+    textDecorationLine: 'underline',
   },
   total: {
     fontSize: 14,

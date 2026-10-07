@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { Package, X } from 'lucide-react-native';
@@ -12,6 +13,16 @@ import Button from '../components/ui/Button';
 const CartScreen = ({ onBack, onCheckout }) => {
   const { items, total, updateAmount, removeFromCart } = useCart();
   const { isAuthenticated } = useAuth();
+  const [stockNotice, setStockNotice] = useState('');
+
+  const handleIncrease = (item) => {
+    const result = updateAmount(item.key, item.amount + 1);
+    setStockNotice(
+      result.status === 'limit'
+        ? `Solo hay ${result.stock} unidades disponibles de ${item.product.product_name}.`
+        : ''
+    );
+  };
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
@@ -74,7 +85,7 @@ const CartScreen = ({ onBack, onCheckout }) => {
                       </Pressable>
                       <Text style={styles.stepperValue}>{item.amount}</Text>
                       <Pressable
-                        onPress={() => updateAmount(item.key, Math.min(item.amount + 1, item.product.stock))}
+                        onPress={() => handleIncrease(item)}
                         style={styles.stepperButton}
                         accessibilityRole="button"
                         accessibilityLabel="Sumar"
@@ -99,6 +110,7 @@ const CartScreen = ({ onBack, onCheckout }) => {
           />
 
           <View style={styles.footer}>
+            {!!stockNotice && <Text style={styles.stockNotice}>{stockNotice}</Text>}
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Total</Text>
               <Text style={styles.totalValue}>{formatCurrency(total)}</Text>
@@ -209,6 +221,11 @@ const styles = StyleSheet.create({
   },
   remove: {
     padding: 4,
+  },
+  stockNotice: {
+    fontSize: 12.5,
+    color: COLORS.error,
+    marginBottom: 12,
   },
   footer: {
     padding: 16,

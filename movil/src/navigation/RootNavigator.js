@@ -24,10 +24,14 @@ import SplashScreen from '../screens/SplashScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import VerifyCodeScreen from '../screens/VerifyCodeScreen';
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import ResetPasswordScreen from '../screens/ResetPasswordScreen';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
 import CartScreen from '../screens/CartScreen';
 import CheckoutScreen from '../screens/CheckoutScreen';
 import ReceiptScreen from '../screens/ReceiptScreen';
+import OrderDetailScreen from '../screens/account/OrderDetailScreen';
+import { wakeUpServer } from '../api/api';
 import TabMenu from './TabMenu';
 
 const Stack = createNativeStackNavigator();
@@ -35,6 +39,12 @@ const Stack = createNativeStackNavigator();
 const SplashRoute = () => {
   const { isAuthenticated, loading } = useAuth();
   const showSplash = useSplashTimer(loading);
+
+  // Mientras se ve la pantalla de carga, se "despierta" el servidor (el plan
+  // gratuito se duerme): cuando aparece el catalogo ya esta listo.
+  useEffect(() => {
+    wakeUpServer();
+  }, []);
 
   useEffect(() => {
     if (showSplash) return;
@@ -70,9 +80,11 @@ const AuthWatcher = () => {
   return null;
 };
 
-const LoginRoute = ({ navigation }) => (
+const LoginRoute = ({ route, navigation }) => (
   <LoginScreen
+    notice={route.params?.passwordChanged ? 'Tu contrasena se actualizo. Inicia sesion con la nueva.' : ''}
     onGoToRegister={() => navigation.navigate('Register')}
+    onGoToForgotPassword={() => navigation.navigate('ForgotPassword')}
     // Cuenta registrada pero nunca verificada: en vez de un error sin salida,
     // se manda directo a pedir un codigo nuevo (ver needsVerification en
     // backendST/src/controllers/clientController.js: loginClient).
@@ -99,6 +111,36 @@ const VerifyCodeRoute = ({ route, navigation }) => (
     email={route.params?.email}
     sendOnMount={!!route.params?.sendOnMount}
     onGoToLogin={() => navigation.navigate('Login')}
+  />
+);
+
+const ForgotPasswordRoute = ({ navigation }) => (
+  <ForgotPasswordScreen
+    onBack={() => navigation.goBack()}
+    onCodeSent={(email) => navigation.replace('ResetPassword', { email })}
+  />
+);
+
+const ResetPasswordRoute = ({ route, navigation }) => (
+  <ResetPasswordScreen
+    email={route.params?.email}
+    onBack={() => navigation.goBack()}
+    // Contrasena cambiada: de vuelta al Login (con la tienda debajo, por si
+    // quiere salir sin entrar) y avisandole que ya puede usar la nueva.
+    onDone={() =>
+      navigation.reset({
+        index: 1,
+        routes: [{ name: 'Tabs' }, { name: 'Login', params: { passwordChanged: true } }],
+      })
+    }
+  />
+);
+
+const OrderDetailRoute = ({ route, navigation }) => (
+  <OrderDetailScreen
+    sale={route.params?.sale}
+    onBack={() => navigation.goBack()}
+    onOpenProduct={(productId) => navigation.navigate('ProductDetails', { productId })}
   />
 );
 
@@ -133,7 +175,10 @@ const RootNavigator = () => (
       <Stack.Screen name="Login" component={LoginRoute} />
       <Stack.Screen name="Register" component={RegisterRoute} />
       <Stack.Screen name="VerifyCode" component={VerifyCodeRoute} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordRoute} />
+      <Stack.Screen name="ResetPassword" component={ResetPasswordRoute} />
       <Stack.Screen name="Tabs" component={TabMenu} />
+      <Stack.Screen name="OrderDetail" component={OrderDetailRoute} />
       <Stack.Screen name="ProductDetails" component={ProductDetailsRoute} />
       <Stack.Screen name="Cart" component={CartRoute} />
       <Stack.Screen name="Checkout" component={CheckoutRoute} />

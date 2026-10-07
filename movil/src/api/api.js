@@ -2,24 +2,28 @@
  * ============================================================
  * CLIENTE HTTP — api.js
  * ============================================================
- * Usa `fetch` (React Native lo trae de fabrica, no hace falta axios).
+ * Usa `fetch`, la funcion nativa de JavaScript (React Native la trae de
+ * fabrica, no hace falta axios). Es el unico lugar de la app que arma
+ * peticiones HTTP.
  *
  * ── La direccion del backend ──
  *
- * "localhost" dentro del emulador de Android NO es la computadora, es el
- * propio telefono virtual: el backend en localhost:4000 queda invisible ahi.
- * El emulador llega a la maquina por la direccion especial 10.0.2.2, que es
- * la que se usa por defecto. En un telefono fisico por WiFi no sirve ninguna
- * de las dos: hay que poner la IP de la computadora en la red (la que Expo
- * muestra al arrancar, tipo 192.168.1.23) en HOST_MANUAL.
+ * 1. APK / produccion: se toma de EXPO_PUBLIC_API_URL, que Expo incrusta al
+ *    construir la app (ver movil/.env.example y la seccion "Generar el APK" del
+ *    README). Ejemplo: https://streetflex-api.onrender.com/api
+ *
+ * 2. Desarrollo, sin esa variable: "localhost" dentro del emulador de Android
+ *    NO es la computadora, es el propio telefono virtual, asi que el emulador
+ *    llega a la PC por la direccion especial 10.0.2.2. En un telefono fisico
+ *    por WiFi hay que poner la IP de la PC en HOST_MANUAL.
  * ============================================================
  */
 
 import { Platform } from 'react-native';
 
 /*
- * Para probar en un telefono fisico: escriba aqui la IP de su computadora.
- * Ejemplo: const HOST_MANUAL = 'http://192.168.1.23:4000/api';
+ * Para probar en un telefono fisico contra el backend local: escriba aqui la
+ * IP de su computadora. Ejemplo: 'http://192.168.1.23:4000/api'
  */
 const HOST_MANUAL = null;
 
@@ -29,7 +33,13 @@ const DEFAULT_HOST = Platform.select({
   default: 'http://localhost:4000/api',
 });
 
-export const API_URL = HOST_MANUAL || DEFAULT_HOST;
+const FROM_ENV = process.env.EXPO_PUBLIC_API_URL;
+
+export const API_URL = (FROM_ENV || HOST_MANUAL || DEFAULT_HOST).replace(/\/+$/, '');
+
+// Un servidor gratuito (Render) se duerme y la primera peticion tarda hasta un
+// minuto en despertarlo; sin tope, la pantalla se quedaria cargando para siempre.
+const TIMEOUT_MS = 60000;
 
 /*
  * El token de sesion vigente, para mandarlo por Authorization en cada
@@ -61,6 +71,7 @@ const FALLBACK_BY_STATUS = {
   401: 'El correo o la contrasena son incorrectos',
   403: 'No tiene permiso para hacer esto',
   404: 'No encontramos lo que buscaba',
+  409: 'Esa accion ya no es posible',
   500: 'Error interno del servidor',
 };
 
@@ -75,9 +86,13 @@ export const request = async (path, { method = 'GET', body, headers } = {}) => {
   // Content-Type a mano, porque fetch necesita agregar el boundary solo.
   const isFormData = body instanceof FormData;
 
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
   try {
     response = await fetch(`${API_URL}${path}`, {
       method,
+      signal: controller.signal,
       headers: {
         Accept: 'application/json',
         ...(body && !isFormData ? { 'Content-Type': 'application/json' } : {}),
@@ -86,11 +101,15 @@ export const request = async (path, { method = 'GET', body, headers } = {}) => {
       },
       body: isFormData ? body : body ? JSON.stringify(body) : undefined,
     });
-  } catch {
+  } catch (error) {
     throw new ApiError(
-      `No se pudo conectar con el servidor (${API_URL}). Revise que el backend este encendido.`,
+      error?.name === 'AbortError'
+        ? 'El servidor tardo demasiado en responder. Intente de nuevo en un momento.'
+        : `No se pudo conectar con el servidor (${API_URL}). Revise su conexion a internet.`,
       0
     );
+  } finally {
+    clearTimeout(timer);
   }
 
   let data = null;
@@ -106,6 +125,13 @@ export const request = async (path, { method = 'GET', body, headers } = {}) => {
   }
 
   return data;
+};
+
+// "Despierta" un servidor gratuito dormido mientras se ve la pantalla de
+// carga, para que la primera pantalla real ya lo encuentre listo. Si falla no
+// pasa nada: cada pantalla maneja sus propios errores.
+export const wakeUpServer = () => {
+  fetch(`${API_URL}/health`).catch(() => {});
 };
 
 export default request;

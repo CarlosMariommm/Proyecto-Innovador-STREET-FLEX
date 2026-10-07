@@ -1,13 +1,20 @@
 /*
- * Validaciones de formularios, compartidas por Login/Register/Checkout.
+ * Validaciones de formularios, compartidas por todas las pantallas (Login,
+ * Registro, Perfil, Recuperar contrasena, Checkout, Valoraciones).
  * Cada validador recibe el valor y devuelve un mensaje de error (string) o
  * null si es valido.
  */
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Las mismas reglas que valida el servidor (backendST/clientController.js).
+export const MIN_AGE = 13;
+export const MAX_AGE = 100;
+
+// Mensaje neutro en genero ("La ciudad es requerido" no concuerda): sirve igual
+// para "El usuario" que para "La direccion".
 export const validateRequired = (label) => (value) =>
-  value && String(value).trim() ? null : `${label} es requerido`;
+  value && String(value).trim() ? null : `Campo obligatorio: ${label.charAt(0).toLowerCase()}${label.slice(1)}`;
 
 export const validateEmail = (value) => {
   if (!value || !value.trim()) return 'El correo es requerido';
@@ -24,6 +31,42 @@ export const validatePassword = (value) => {
 export const validatePhone = (value) => {
   if (!value || !value.trim()) return 'El telefono es requerido';
   if (!/^[0-9+()\s-]{7,15}$/.test(value.trim())) return 'El telefono no es valido';
+  return null;
+};
+
+// Edad: obligatoria, entera, sin signos (nada de negativos ni decimales) y
+// dentro de un rango razonable.
+export const validateAge = (value) => {
+  const text = String(value ?? '').trim();
+  if (!text) return 'La edad es requerida';
+  if (!/^\d+$/.test(text)) return 'La edad debe ser un numero entero positivo';
+  const age = Number(text);
+  if (age < MIN_AGE) return `Debes tener al menos ${MIN_AGE} anos`;
+  if (age > MAX_AGE) return `La edad no puede ser mayor a ${MAX_AGE}`;
+  return null;
+};
+
+// Un valor numerico que no puede ser negativo (ej. codigo postal). Si es
+// opcional y esta vacio, pasa.
+export const validateNonNegativeNumber = (label, { required = false } = {}) => (value) => {
+  const text = String(value ?? '').trim();
+  if (!text) return required ? `${label} es requerido` : null;
+  if (!/^\d+$/.test(text)) return `${label} debe ser un numero sin signos ni letras`;
+  return null;
+};
+
+export const validateVerificationCode = (value) => {
+  const text = String(value ?? '').trim();
+  if (!text) return 'El codigo es requerido';
+  if (!/^\d{6}$/.test(text)) return 'El codigo tiene 6 digitos';
+  return null;
+};
+
+// Comentario de una valoracion: obligatorio y con un tope de largo.
+export const validateReviewComment = (value) => {
+  const text = String(value ?? '').trim();
+  if (!text) return 'Escribe un comentario';
+  if (text.length > 500) return 'El comentario no puede pasar de 500 caracteres';
   return null;
 };
 

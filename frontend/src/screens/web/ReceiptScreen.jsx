@@ -43,10 +43,13 @@ const ReceiptScreen = () => {
     try {
       const total = getCartTotal();
       
+      // El carrito guarda `amount` y `subtotal` (ver shoppingCarModel.js). Antes
+      // se mandaba `quantity`/`price_unit`, que el servidor descartaba: el
+      // pedido quedaba sin cantidades y nunca descontaba stock.
       const productsPayload = cart.map(item => ({
         id_product: item.product._id,
-        quantity: item.quantity,
-        price_unit: item.product.price
+        amount: item.quantity,
+        subtotal: item.product.price * item.quantity
       }));
 
       // 1. Crear el carrito en la DB (o usar el endpoint existente)

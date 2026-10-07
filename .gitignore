@@ -1,2 +1,30 @@
 # Configuracion local de herramientas (no es parte del proyecto)
 .claude/
+
+# Dependencias: se reinstalan con npm install, no se suben al repositorio
+node_modules/
+
+# Variables de entorno con claves reales (base de datos, correo, Cloudinary...).
+# Nunca al repositorio: cada quien crea su .env a partir de .env.example.
+.env
+.env.*
+!.env.example
+# La web solo guarda ahi la ruta de la API (VITE_API_URL=/api), sin secretos.
+!frontend/.env
+
+# Builds y archivos generados
+dist/
+build/
+web-build/
+.expo/
+movil/android/
+movil/ios/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+*.log

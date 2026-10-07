@@ -7,10 +7,11 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Lock, Mail, Phone, User } from 'lucide-react-native';
+import { Calendar, Lock, Mail, Phone, User } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { registerClient } from '../api/authApi';
 import {
+  validateAge,
   validateEmail,
   validateForm,
   validatePassword,
@@ -27,6 +28,7 @@ const RegisterScreen = ({ onGoToLogin, onRegistered }) => {
     username: '',
     email: '',
     phone_number: '',
+    age: '',
     password: '',
     confirmPassword: '',
   });
@@ -46,6 +48,7 @@ const RegisterScreen = ({ onGoToLogin, onRegistered }) => {
       username: validateRequired('El usuario'),
       email: validateEmail,
       phone_number: validatePhone,
+      age: validateAge,
       password: validatePassword,
       confirmPassword: (v) => (v === values.password ? null : 'Las contrasenas no coinciden'),
     });
@@ -61,6 +64,7 @@ const RegisterScreen = ({ onGoToLogin, onRegistered }) => {
         password: values.password,
         full_name: values.full_name.trim(),
         phone_number: values.phone_number.trim(),
+        age: values.age.trim(),
       });
       onRegistered(values.email.trim());
     } catch (err) {
@@ -115,6 +119,17 @@ const RegisterScreen = ({ onGoToLogin, onRegistered }) => {
             onChangeText={handleChange('phone_number')}
             error={errors.phone_number}
             keyboardType="phone-pad"
+          />
+
+          <TextField
+            label="Edad"
+            icon={Calendar}
+            placeholder="18"
+            value={values.age}
+            onChangeText={handleChange('age')}
+            error={errors.age}
+            keyboardType="number-pad"
+            maxLength={3}
           />
 
           <TextField

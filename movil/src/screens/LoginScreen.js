@@ -14,10 +14,11 @@ import { COLORS } from '../theme/colors';
 import { loginClient } from '../api/authApi';
 import { useAuth } from '../hooks/useAuth';
 import { validateEmail, validateForm, hasNoErrors } from '../utils/validations';
+import { buildSessionUser } from '../utils/sessionUser';
 import Button from '../components/ui/Button';
 import TextField from '../components/ui/TextField';
 
-const LoginScreen = ({ onGoToRegister, onNeedsVerification, onSkip }) => {
+const LoginScreen = ({ notice = '', onGoToRegister, onGoToForgotPassword, onNeedsVerification, onSkip }) => {
   const { login } = useAuth();
   const { top } = useSafeAreaInsets();
   const [values, setValues] = useState({ email: '', password: '' });
@@ -43,15 +44,7 @@ const LoginScreen = ({ onGoToRegister, onNeedsVerification, onSkip }) => {
       setLoading(true);
       setServerError('');
       const res = await loginClient({ email: values.email.trim(), password: values.password });
-      login(res.token, {
-        _id: res._id,
-        username: res.username,
-        email: res.email,
-        full_name: res.full_name,
-        phone_number: res.phone_number,
-        favorites: res.favorites || [],
-        image: res.image,
-      });
+      login(res.token, buildSessionUser(res));
     } catch (err) {
       // Cuenta creada pero nunca verificada: en vez de dejarlo leyendo el
       // error sin poder hacer nada, se manda directo a poner el codigo.
@@ -89,6 +82,12 @@ const LoginScreen = ({ onGoToRegister, onNeedsVerification, onSkip }) => {
           <Text style={styles.title}>Inicia sesion</Text>
           <Text style={styles.subtitle}>Puedes seguir viendo la tienda sin cuenta.</Text>
 
+          {!!notice && (
+            <View style={styles.successBox}>
+              <Text style={styles.successText}>{notice}</Text>
+            </View>
+          )}
+
           <TextField
             label="Correo electronico"
             icon={Mail}
@@ -111,6 +110,10 @@ const LoginScreen = ({ onGoToRegister, onNeedsVerification, onSkip }) => {
             isPassword
             autoCapitalize="none"
           />
+
+          <Pressable onPress={onGoToForgotPassword} hitSlop={8} style={styles.forgot}>
+            <Text style={styles.forgotText}>Olvidaste tu contrasena?</Text>
+          </Pressable>
 
           {!!serverError && (
             <View style={styles.notice}>
@@ -139,6 +142,30 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
+  },
+  successBox: {
+    borderWidth: 1,
+    borderColor: COLORS.success,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 18,
+  },
+  successText: {
+    color: COLORS.success,
+    fontSize: 13,
+    lineHeight: 19,
+  },
+  forgot: {
+    alignSelf: 'flex-end',
+    marginTop: -6,
+    marginBottom: 18,
+  },
+  forgotText: {
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: COLORS.textMuted,
+    textDecorationLine: 'underline',
   },
   skip: {
     position: 'absolute',

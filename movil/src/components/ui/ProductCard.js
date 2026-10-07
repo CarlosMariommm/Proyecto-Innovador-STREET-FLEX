@@ -15,10 +15,12 @@ import { Image } from 'expo-image';
 import { Package } from 'lucide-react-native';
 import { COLORS } from '../../theme/colors';
 import { formatCurrency } from '../../utils/formatCurrency';
+import RatingStars from '../product/RatingStars';
 
 const ProductCard = ({ product, onPress }) => {
   const [imageFailed, setImageFailed] = useState(false);
   const outOfStock = Number(product.stock) <= 0;
+  const reviewCount = product.reviews?.length || 0;
 
   return (
     <Pressable
@@ -56,6 +58,17 @@ const ProductCard = ({ product, onPress }) => {
           {product.product_name}
         </Text>
         <Text style={styles.price}>{formatCurrency(product.price)}</Text>
+
+        {reviewCount > 0 ? (
+          <View style={styles.ratingRow}>
+            <RatingStars rating={product.average_rating} size={11} showValue={false} />
+            <Text style={styles.ratingCount}>
+              {Number(product.average_rating || 0).toFixed(1)} ({reviewCount})
+            </Text>
+          </View>
+        ) : (
+          <Text style={styles.noReviews}>Sin valoraciones</Text>
+        )}
       </View>
     </Pressable>
   );
@@ -115,6 +128,21 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: COLORS.textMuted,
     marginTop: 4,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+  },
+  ratingCount: {
+    fontSize: 11,
+    color: COLORS.textMuted,
+  },
+  noReviews: {
+    fontSize: 11,
+    color: COLORS.placeholder,
+    marginTop: 6,
   },
 });
 
