@@ -64,6 +64,15 @@ Write-Host "3/4 Generando el proyecto nativo y compilando el APK (la primera vez
 npx expo prebuild --platform android --no-install
 if ($LASTEXITCODE -ne 0) { throw "Fallo expo prebuild." }
 
+# El paquete de JavaScript lleva la direccion de la API incrustada
+# (EXPO_PUBLIC_API_URL), pero Gradle no ve esa variable como entrada de la tarea:
+# si ya hay un paquete de una compilacion anterior lo da por vigente y el APK sale
+# con la direccion vieja. Se borra para obligarlo a generarse de nuevo.
+foreach ($tipo in "assets", "res") {
+  $viejo = Join-Path $CarpetaCorta "android\app\build\generated\$tipo\createBundleReleaseJsAndAssets"
+  Remove-Item $viejo -Recurse -Force -ErrorAction SilentlyContinue
+}
+
 Push-Location android
 try {
   .\gradlew.bat assembleRelease "-PreactNativeArchitectures=$Arquitecturas" --no-daemon
