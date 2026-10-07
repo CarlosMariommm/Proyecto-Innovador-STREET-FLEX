@@ -125,7 +125,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\generar-apk.ps1 -ApiUrl "http
 
 Sale en `movil/apk/StreetFlex.apk`. Para compartirlo: subirlo a **GitHub → Releases** del repositorio o a Google Drive.
 
-**Descarga del APK:** _(pegar aquí el enlace)_
+**Descarga del APK (Android):** [StreetFlex.apk — v1.0.0](https://github.com/CarlosMariommm/Proyecto-Innovador-STREET-FLEX/releases/download/v1.0.0/StreetFlex.apk) · todas las versiones en [Releases](https://github.com/CarlosMariommm/Proyecto-Innovador-STREET-FLEX/releases).
+
+La app usa el backend publicado en Render, así que no hace falta instalar nada más. Si el celular bloquea la instalación, activar **instalar apps de origen desconocido**. La primera vez puede tardar cerca de un minuto en cargar, porque el servidor gratuito "duerme" tras 15 minutos sin uso.
 
 ### Estructura de carpetas de la app
 
