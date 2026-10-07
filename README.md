@@ -105,6 +105,15 @@ Sin el *Root Directory* el despliegue falla con `ENOENT ... /opt/render/project/
 
 > El plan gratuito "duerme" el servidor tras 15 minutos sin uso; la primera petición tarda ~1 minuto. La app lo "despierta" mientras muestra la pantalla de carga.
 
+### Publicar la tienda web (Vercel)
+
+La web llama a `/api/...` (misma dirección que la página). En local lo resuelve el proxy de Vite, pero en Vercel no hay backend, y sin más la tienda muestra **"No products found."**. [`frontend/vercel.json`](frontend/vercel.json) arregla eso: reenvía `/api/*` al backend de Render y devuelve `index.html` en las rutas de la web (para que recargar `/producto/...` no dé 404). Así la cookie de sesión sigue siendo de la misma dirección y el login del panel funciona.
+
+1. En `frontend/vercel.json`, cambiar `TU-SERVICIO.onrender.com` por la dirección real del servicio de Render.
+2. En Vercel, el proyecto debe tener **Root Directory** `frontend`.
+3. En Render, en **Environment**, poner `FRONTEND_URL` con la dirección de Vercel (sin `/` al final), por ejemplo `https://street-flex.vercel.app`; si no, el backend rechaza por CORS las peticiones que no son de lectura.
+4. Volver a desplegar en Vercel.
+
 ### Generar el APK
 
 Requisitos: Node, JDK 17 y el SDK de Android (el de Android Studio).
