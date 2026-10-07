@@ -5,11 +5,14 @@ import { Heart, Package, Star } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { fetchProductById, addProductReview } from '../api/productApi';
 import { addFavorite, removeFavorite } from '../api/clientApi';
+import { fetchSalesByClient } from '../api/saleApi';
 import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../context/CartContext';
 import { formatCurrency } from '../utils/formatCurrency';
+import { validateReviewComment } from '../utils/validations';
 import BackHeader from '../components/ui/BackHeader';
 import Button from '../components/ui/Button';
+import TextField from '../components/ui/TextField';
 import LoadingIndicator from '../components/ui/LoadingIndicator';
 import RatingStars from '../components/product/RatingStars';
 import ReviewItem from '../components/product/ReviewItem';
@@ -77,8 +80,11 @@ const ProductDetailsScreen = ({ productId, onBack }) => {
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [variantError, setVariantError] = useState('');
+  const [cartNotice, setCartNotice] = useState({ text: '', isError: false });
+  const [purchased, setPurchased] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
+  const [reviewCommentError, setReviewCommentError] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewNotice, setReviewNotice] = useState('');
 
@@ -107,6 +113,32 @@ const ProductDetailsScreen = ({ productId, onBack }) => {
     setIsFavorite((user?.favorites || []).some((id) => id === productId || id?._id === productId));
   }, [user, productId]);
 
+  // Solo se puede valorar lo que ya se compro: se busca este producto en los
+  // pedidos del cliente (un pedido cancelado no cuenta como compra). El
+  // servidor vuelve a comprobarlo al guardar la valoracion.
+  useEffect(() => {
+    if (!isAuthenticated || !user?._id) {
+      setPurchased(false);
+      return undefined;
+    }
+    let alive = true;
+    fetchSalesByClient(user._id)
+      .then((sales) => {
+        if (!alive) return;
+        setPurchased(
+          sales.some(
+            (sale) =>
+              sale.status !== 'Cancelado' &&
+              (sale.id_shoppig_car?.products || []).some((p) => (p.id_product?._id || p.id_product) === productId)
+          )
+        );
+      })
+      .catch(() => alive && setPurchased(false));
+    return () => {
+      alive = false;
+    };
+  }, [isAuthenticated, user?._id, productId]);
+
   const toggleFavorite = async () => {
     if (!isAuthenticated) return;
     try {
@@ -126,11 +158,19 @@ const ProductDetailsScreen = ({ productId, onBack }) => {
 
   const submitReview = async () => {
     if (!user?._id) return;
+
+    const invalid = validateReviewComment(reviewComment);
+    if (invalid) {
+      setReviewCommentError(invalid);
+      return;
+    }
+
     try {
       setSubmittingReview(true);
       setReviewNotice('');
-      await addProductReview({ productId, id_client: user._id, rating: reviewRating, comment: reviewComment });
+      await addProductReview({ productId, id_client: user._id, rating: reviewRating, comment: reviewComment.trim() });
       setReviewComment('');
+      setReviewRating(5);
       setReviewNotice('Gracias por tu resena.');
       load();
     } catch (err) {
@@ -142,6 +182,9 @@ const ProductDetailsScreen = ({ productId, onBack }) => {
 
   const hasSizes = (product?.sizes?.length || 0) > 0;
   const hasColors = (product?.colors?.length || 0) > 0;
+  const alreadyReviewed = (product?.reviews || []).some(
+    (r) => (r.id_client?._id || r.id_client) === user?._id
+  );
 
   const handleAddToCart = () => {
     if (hasSizes && !selectedSize) {
@@ -153,7 +196,19 @@ const ProductDetailsScreen = ({ productId, onBack }) => {
       return;
     }
     setVariantError('');
-    addToCart(product, quantity, { size: selectedSize, color: selectedColor });
+
+    const result = addToCart(product, quantity, { size: selectedSize, color: selectedColor });
+    const MESSAGES = {
+      added: { text: 'Agregado al carrito.', isError: false },
+      capped: { text: `Solo hay ${result.stock} unidades disponibles: agregamos las que quedaban.`, isError: true },
+      limit: { text: `Ya tienes en el carrito las ${result.stock} unidades disponibles.`, isError: true },
+      out_of_stock: { text: 'Este producto ya no tiene stock.', isError: true },
+      invalid: { text: 'La cantidad no es valida.', isError: true },
+    };
+    setCartNotice(MESSAGES[result.status] || MESSAGES.invalid);
+    // De nuevo en 1: dejar el 3 de la compra anterior es la causa clasica de
+    // agregar sin querer otras tres.
+    if (result.status === 'added' || result.status === 'capped') setQuantity(1);
   };
 
   if (loading) {
@@ -252,6 +307,9 @@ const ProductDetailsScreen = ({ productId, onBack }) => {
           onPress={handleAddToCart}
           disabled={outOfStock}
         />
+        {!!cartNotice.text && (
+          <Text style={[styles.cartNotice, cartNotice.isError && styles.cartNoticeError]}>{cartNotice.text}</Text>
+        )}
 
         <View style={styles.reviewsSection}>
           <Text style={styles.sectionTitle}>Resenas ({product.reviews?.length || 0})</Text>
@@ -261,16 +319,34 @@ const ProductDetailsScreen = ({ productId, onBack }) => {
             <Text style={styles.noReviews}>Este producto todavia no tiene resenas.</Text>
           )}
 
-          {isAuthenticated && (
+          {!isAuthenticated ? (
+            <Text style={styles.reviewRule}>Inicia sesion y compra este producto para poder valorarlo.</Text>
+          ) : alreadyReviewed ? (
+            <Text style={styles.reviewRule}>Ya valoraste este producto. Gracias por tu opinion.</Text>
+          ) : !purchased ? (
+            <Text style={styles.reviewRule}>Solo puedes valorar los productos que ya compraste.</Text>
+          ) : (
             <View style={styles.reviewForm}>
               <Text style={styles.reviewFormTitle}>Dejar una resena</Text>
               <View style={styles.starPicker}>
                 {[1, 2, 3, 4, 5].map((n) => (
-                  <Pressable key={n} onPress={() => setReviewRating(n)} hitSlop={6}>
+                  <Pressable key={n} onPress={() => setReviewRating(n)} hitSlop={6} accessibilityLabel={`${n} estrellas`}>
                     <Star size={22} color={COLORS.text} fill={n <= reviewRating ? COLORS.text : 'none'} />
                   </Pressable>
                 ))}
               </View>
+              <TextField
+                label="Tu comentario"
+                placeholder="Cuenta que tal te parecio"
+                value={reviewComment}
+                onChangeText={(text) => {
+                  setReviewComment(text);
+                  if (reviewCommentError) setReviewCommentError('');
+                }}
+                error={reviewCommentError}
+                multiline
+                maxLength={500}
+              />
               {!!reviewNotice && <Text style={styles.reviewNotice}>{reviewNotice}</Text>}
               <Button
                 label="Enviar resena"
@@ -447,6 +523,23 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   noReviews: {
+    fontSize: 13,
+    color: COLORS.textMuted,
+  },
+  cartNotice: {
+    fontSize: 12.5,
+    color: COLORS.success,
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  cartNoticeError: {
+    color: COLORS.error,
+  },
+  reviewRule: {
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
     fontSize: 13,
     color: COLORS.textMuted,
   },

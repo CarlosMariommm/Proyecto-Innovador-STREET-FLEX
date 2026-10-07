@@ -1,9 +1,8 @@
 import jwt from 'jsonwebtoken';
+import { getJwtSecret } from './jwtSecret.js';
 
 const generateToken = (res, adminId) => {
-  const secret = process.env.JWT_SECRET || 'streetflex_super_secret_key_123';
-
-  const token = jwt.sign({ id: adminId }, secret, {
+  const token = jwt.sign({ id: adminId }, getJwtSecret(), {
     expiresIn: '30d',
   });
 

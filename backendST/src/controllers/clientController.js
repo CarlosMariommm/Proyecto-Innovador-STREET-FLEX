@@ -9,9 +9,58 @@ const clientController = {};
 const CODE_TTL_MS = 15 * 60 * 1000; // 15 minutos
 const generateVerificationCode = () => String(Math.floor(100000 + Math.random() * 900000));
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_AGE = 13;
+const MAX_AGE = 100;
+
+// La misma forma de cliente en todas las respuestas (login, perfil, edicion,
+// verificacion): la app movil guarda esto tal cual como sesion.
+const clientPayload = (client) => ({
+  _id: client._id,
+  username: client.username,
+  email: client.email,
+  full_name: client.full_name,
+  phone_number: client.phone_number,
+  age: client.age,
+  favorites: client.favorites || [],
+  image: client.image,
+});
+
+// Devuelve el mensaje del primer dato invalido, o null si todo esta bien. Las
+// mismas reglas que valida la app movil (utils/validations.js): quien se salte
+// la pantalla y le pegue directo a la API no se las salta tambien.
+const validateClientFields = ({ full_name, username, email, phone_number, age }, { requireAll }) => {
+  if ((requireAll || full_name !== undefined) && !String(full_name || '').trim()) {
+    return 'El nombre completo es obligatorio';
+  }
+  if ((requireAll || username !== undefined) && !String(username || '').trim()) {
+    return 'El nombre de usuario es obligatorio';
+  }
+  if (email !== undefined && !EMAIL_REGEX.test(String(email).trim())) {
+    return 'El correo no tiene un formato valido';
+  }
+  if (phone_number !== undefined && phone_number !== '' && !/^[0-9+()\s-]{7,15}$/.test(String(phone_number).trim())) {
+    return 'El telefono no es valido';
+  }
+  if (age !== undefined && age !== null && age !== '') {
+    const n = Number(age);
+    if (!Number.isInteger(n)) return 'La edad debe ser un numero entero';
+    if (n < MIN_AGE || n > MAX_AGE) return `La edad debe estar entre ${MIN_AGE} y ${MAX_AGE} años`;
+  }
+  // La edad es opcional aqui a proposito: el registro de la web todavia no la
+  // pide. La app movil si la exige (RegisterScreen).
+  return null;
+};
+
 clientController.createClient = async (req, res) => {
   try {
-    const { username, email, password, full_name, phone_number, image, active, verified } = req.body;
+    const { username, email, password, full_name, phone_number, age, image, active, verified } = req.body;
+
+    const invalid = validateClientFields({ full_name, username, email, phone_number, age }, { requireAll: true });
+    if (invalid) return res.status(400).json({ message: invalid });
+    if (!password || String(password).length < 6) {
+      return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres' });
+    }
 
     const emailExists = await Client.findOne({ email });
     if (emailExists) {
@@ -35,7 +84,9 @@ clientController.createClient = async (req, res) => {
     const verificationCodeExpires = Date.now() + CODE_TTL_MS;
 
     const client = await Client.create({
-      username, email, password: hashedPassword, full_name, phone_number, image, active, verified: false,
+      username, email, password: hashedPassword, full_name, phone_number,
+      age: age === undefined || age === '' ? undefined : Number(age),
+      image, active, verified: false,
       verificationToken, verificationCode, verificationCodeExpires
     });
 
@@ -94,16 +145,7 @@ clientController.loginClient = async (req, res) => {
 
       const token = generateToken(res, client._id);
 
-      res.json({
-        token,
-        _id: client._id,
-        username: client.username,
-        email: client.email,
-        full_name: client.full_name,
-        phone_number: client.phone_number,
-        favorites: client.favorites || [],
-        image: client.image
-      });
+      res.json({ token, ...clientPayload(client) });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
     }
@@ -131,20 +173,45 @@ clientController.getClientProfile = async (req, res) => {
     const client = await Client.findById(req.client._id);
 
     if (client) {
-      res.json({
-        _id: client._id,
-        username: client.username,
-        email: client.email,
-        full_name: client.full_name,
-        phone_number: client.phone_number,
-        favorites: client.favorites || [],
-        image: client.image
-      });
+      res.json(clientPayload(client));
     } else {
       res.status(404).json({ message: 'Client not found' });
     }
   } catch (error) {
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Edicion del perfil por el propio cliente (PUT /clients/profile). Solo deja
+// tocar nombre, usuario, telefono y edad: el correo y la contraseña tienen sus
+// propios flujos (verificacion / recuperacion) y el `active` es del admin.
+clientController.updateClientProfile = async (req, res) => {
+  try {
+    const { full_name, username, phone_number, age } = req.body;
+
+    const invalid = validateClientFields({ full_name, username, phone_number, age }, { requireAll: false });
+    if (invalid) return res.status(400).json({ message: invalid });
+
+    const client = await Client.findById(req.client._id);
+    if (!client) return res.status(404).json({ message: 'Client not found' });
+
+    if (username !== undefined && username.trim() !== client.username) {
+      const taken = await Client.findOne({ username: username.trim(), _id: { $ne: client._id } });
+      if (taken) return res.status(400).json({ message: 'Ese nombre de usuario ya esta en uso' });
+      client.username = username.trim();
+    }
+    if (full_name !== undefined) client.full_name = full_name.trim();
+    if (phone_number !== undefined) client.phone_number = String(phone_number).trim();
+    if (age !== undefined && age !== null && age !== '') client.age = Number(age);
+
+    await client.save();
+    res.json(clientPayload(client));
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'Ese nombre de usuario ya esta en uso' });
+    }
+    console.log('error' + error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -265,16 +332,7 @@ clientController.verifyCode = async (req, res) => {
     }
 
     const token = generateToken(res, client._id);
-    res.json({
-      token,
-      _id: client._id,
-      username: client.username,
-      email: client.email,
-      full_name: client.full_name,
-      phone_number: client.phone_number,
-      favorites: client.favorites || [],
-      image: client.image,
-    });
+    res.json({ token, ...clientPayload(client) });
   } catch (error) {
     res.status(500).json({ message: 'Error del servidor' });
   }
@@ -323,16 +381,68 @@ clientController.forgotPassword = async (req, res) => {
       return res.status(404).json({ message: 'No existe una cuenta con ese correo' });
     }
 
+    // El link (web) vive 1 hora; el codigo de 6 digitos (app movil) 15 minutos,
+    // porque es corto y por eso mas facil de adivinar si dura mucho.
     const resetToken = crypto.randomBytes(20).toString('hex');
+    const resetCode = generateVerificationCode();
     client.resetPasswordToken = resetToken;
     client.resetPasswordExpires = Date.now() + 3600000; // 1 hora
+    client.resetCode = resetCode;
+    client.resetCodeExpires = Date.now() + CODE_TTL_MS;
     await client.save();
 
-    await sendPasswordResetEmail(client.email, resetToken);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[DEV] Codigo de recuperacion para ${client.email}: ${resetCode}`);
+    }
+
+    try {
+      await sendPasswordResetEmail(client.email, { token: resetToken, code: resetCode });
+    } catch (err) {
+      console.error('Error al enviar correo de recuperacion:', err);
+      // En desarrollo el codigo sale por la consola y se puede seguir; en
+      // produccion, sin correo no hay recuperacion posible: se avisa.
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(502).json({ message: 'No pudimos enviar el correo. Intenta de nuevo en un momento.' });
+      }
+    }
 
     res.json({ message: 'Correo de recuperación enviado' });
   } catch (error) {
     res.status(500).json({ message: "Error del servidor" });
+  }
+};
+
+// Cambio de contraseña con el codigo de 6 digitos del correo (app movil).
+clientController.resetPasswordWithCode = async (req, res) => {
+  try {
+    const { email, code, password } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({ message: 'Falta el correo o el codigo' });
+    }
+    if (!password || String(password).length < 6) {
+      return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres' });
+    }
+
+    const client = await Client.findOne({ email });
+    if (!client || !client.resetCode || client.resetCode !== String(code)) {
+      return res.status(400).json({ message: 'El codigo es incorrecto' });
+    }
+    if (!client.resetCodeExpires || client.resetCodeExpires < Date.now()) {
+      return res.status(400).json({ message: 'El codigo ha expirado, solicita uno nuevo' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    client.password = await bcrypt.hash(password, salt);
+    client.resetCode = undefined;
+    client.resetCodeExpires = undefined;
+    client.resetPasswordToken = undefined;
+    client.resetPasswordExpires = undefined;
+    await client.save();
+
+    res.json({ message: 'Contraseña actualizada con éxito' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error del servidor' });
   }
 };
 
@@ -354,6 +464,8 @@ clientController.resetPassword = async (req, res) => {
     client.password = await bcrypt.hash(password, salt);
     client.resetPasswordToken = undefined;
     client.resetPasswordExpires = undefined;
+    client.resetCode = undefined;
+    client.resetCodeExpires = undefined;
     await client.save();
 
     res.json({ message: 'Contraseña actualizada con éxito' });

@@ -1,15 +1,12 @@
 import { request } from './api';
 
-export const fetchCartByClient = async (clientId) => {
-  const res = await request(`/shopping-cars/client/${clientId}`);
-  return res.data || null;
-};
-
-// Sincroniza (crea o actualiza) el carrito del cliente en el backend.
-export const syncCart = async (clientId, { products, total, discount, total_w_discount }) => {
-  const res = await request(`/shopping-cars/sync/${clientId}`, {
-    method: 'PUT',
-    body: { products, total, discount, total_w_discount },
+// Guarda el carrito de un pedido como un Shopping_Car NUEVO y devuelve su id,
+// que es lo que la venta (Sale) necesita en `id_shoppig_car`. Uno por pedido:
+// ver CartContext.saveOrderCart.
+export const createOrderCart = async ({ products, id_client, total, discount, total_w_discount }) => {
+  const res = await request('/shopping-cars', {
+    method: 'POST',
+    body: { products, id_client, total, discount, total_w_discount },
   });
-  return res.data;
+  return res.cartId;
 };

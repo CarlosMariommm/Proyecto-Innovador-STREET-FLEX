@@ -1,5 +1,6 @@
 import express from 'express';
 import saleController from '../controllers/saleController.js';
+import { protectClient } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
@@ -10,5 +11,7 @@ router.route('/')
 // Pedidos de un cliente específico
 router.get('/client/:clientId', saleController.getSalesByClient);
 
-export default router;
+// Cancelar un pedido propio (devuelve el stock)
+router.put('/:id/cancel', protectClient, saleController.cancelSale);
 
+export default router;

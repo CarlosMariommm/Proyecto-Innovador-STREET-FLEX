@@ -1,192 +1,136 @@
-# Proyecto StreetFlex - Avance 3
+# STREET FLEX — Tienda en línea
 
-## Descripción
-Este proyecto corresponde al **Avance 3** del módulo 3.8 del Instituto Técnico Ricaldone. Es una aplicación fullstack desacoplada para una tienda en línea. Cuenta con un **Backend RESTful** construido con Node.js y Express conectado a MongoDB Atlas, y un **Frontend** construido con React.js (Vite) que consume la API mediante `fetch`. La comunicación entre ambas partes se maneja a través de **JWT almacenado en cookies HttpOnly** para garantizar seguridad en la autenticación.
+[![Licencia: CC BY-NC-SA 4.0](https://img.shields.io/badge/Licencia-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es)
 
----
+Tienda en línea de ropa y accesorios hecha por estudiantes de **3.er año de Desarrollo de Software, Instituto Técnico Ricaldone**. Es un sistema completo con tres partes que comparten la misma base de datos:
 
-## Tecnologías y Herramientas
+| Carpeta | Qué es | Tecnología |
+|---|---|---|
+| [`backendST/`](backendST) | API REST | Node.js, Express 5, MongoDB Atlas (Mongoose), JWT |
+| [`frontend/`](frontend) | Tienda web y panel de administración | React 19 (Vite) |
+| [`movil/`](movil) | **Aplicación móvil Android/iOS** (entrega del Módulo 5) | React Native, Expo SDK 54 |
 
-### Backend
-- **Node.js + Express**: Servidor HTTP y API RESTful bajo el patrón MVC.
-- **Mongoose**: ODM para modelado de datos y conexión a MongoDB.
-- **MongoDB Atlas**: Base de datos NoSQL en la nube.
-- **JSON Web Token (JWT)**: Autenticación con tokens almacenados en cookies `httpOnly`.
-- **bcryptjs**: Hash seguro de contraseñas.
-- **Cloudinary + Multer**: Gestión y subida de imágenes de productos a servidor externo.
-- **express-rate-limit**: Middleware de protección contra ataques de fuerza bruta.
-- **cookie-parser**: Lectura de cookies en las peticiones del servidor.
-- **CORS**: Habilitado exclusivamente para los orígenes `localhost:5173` y `localhost:5174`.
+## Equipo de desarrollo
 
-### Frontend
-- **React.js (Vite)**: Biblioteca principal para la interfaz de usuario.
-- **Tailwind CSS v4**: Framework de utilidades CSS para un diseño premium y responsive.
-- **React Router DOM**: Enrutamiento declarativo y protección de rutas privadas.
-- **React Hook Form**: Gestión y validación eficiente de formularios.
-- **React Hot Toast**: Notificaciones visuales (toasts) para confirmar acciones al usuario.
-- **Lucide React**: Biblioteca de iconos modernos.
-- **Fetch API (nativa)**: Comunicación HTTP con el backend con `credentials: 'include'` para cookies.
-
----
-
-## Estructura del Proyecto
-
-```text
-/Proyecto-Innovador-STREET-FLEX
-│
-├── /backend                        → Servidor de la API RESTful
-│   ├── app.js                      → Configuración de Express, middlewares y rutas
-│   ├── .env                        → Variables de entorno (DB, JWT, Cloudinary)
-│   └── /src
-│       ├── /config
-│       │   └── db.js               → Conexión a MongoDB Atlas con Mongoose
-│       ├── /controllers            → Lógica de negocio (objetos planos, ES Modules)
-│       │   ├── auth.controller.js
-│       │   ├── category.controller.js
-│       │   ├── product.controller.js
-│       │   ├── customer.controller.js
-│       │   ├── employee.controller.js
-│       │   ├── order.controller.js
-│       │   └── dashboard.controller.js
-│       ├── /models                 → Esquemas de Mongoose (timestamps: true, strict: false)
-│       │   ├── User.js
-│       │   ├── Category.js
-│       │   ├── Product.js
-│       │   └── Order.js
-│       ├── /routes                 → Endpoints con .route() encadenado
-│       │   ├── auth.routes.js
-│       │   ├── category.routes.js
-│       │   ├── product.routes.js
-│       │   ├── customer.routes.js
-│       │   ├── employee.routes.js
-│       │   ├── order.routes.js
-│       │   └── dashboard.routes.js
-│       ├── /middlewares
-│       │   └── auth.middleware.js  → Protección de rutas con JWT desde cookies
-│       └── /utils
-│           ├── cloudinary.js       → Configuración de Multer + Cloudinary
-│           └── generateToken.js    → Generación y seteo de cookie JWT
-│
-└── /frontend-private               → Aplicación React conectada al backend
-    └── /src
-        ├── /api
-        │   └── auth.js             → Funciones fetch para Login, Registro y Logout
-        ├── /components
-        │   ├── /Auth               → AuthContext (useContext) y ProtectedRoute
-        │   ├── /Categories         → Módulo CRUD + useCategories (Custom Hook)
-        │   ├── /Customers          → Módulo CRUD + useCustomers (Custom Hook)
-        │   ├── /Employees          → Módulo CRUD + useEmployees (Custom Hook)
-        │   ├── /Orders             → Módulo CRUD + useOrders (Custom Hook)
-        │   ├── /Products           → Módulo CRUD + useProducts (Custom Hook, FormData)
-        │   ├── /Layout             → AdminLayout con Sidebar y Topbar
-        │   └── /UI                 → Componentes reutilizables: Button, Input
-        ├── /hooks
-        │   └── useDashboard.js     → Métricas del panel desde /api/dashboard
-        └── /pages
-            ├── Home.jsx
-            ├── Login.jsx
-            ├── Register.jsx
-            ├── AdminDashboard.jsx  → Panel con métricas y pedidos recientes en tiempo real
-            └── /admin
-                ├── Categories.jsx
-                ├── Products.jsx
-                ├── Customers.jsx
-                ├── Employees.jsx
-                └── Orders.jsx
-```
-
----
-
-## Endpoints de la API
-
-| Método | Endpoint | Acceso | Descripción |
-|---|---|---|---|
-| POST | `/api/auth/register` | Público | Registra un nuevo usuario |
-| POST | `/api/auth/login` | Público | Inicia sesión y emite cookie JWT |
-| POST | `/api/auth/logout` | Autenticado | Cierra sesión limpiando la cookie |
-| GET | `/api/categories` | Público | Lista todas las categorías |
-| POST / PUT / DELETE | `/api/categories/:id` | Admin | CRUD de categorías |
-| GET | `/api/products` | Público | Lista todos los productos |
-| POST / PUT / DELETE | `/api/products/:id` | Admin | CRUD de productos (imagen vía Cloudinary) |
-| GET / POST | `/api/customers` | Admin | Lista y crea clientes |
-| GET / PUT / DELETE | `/api/customers/:id` | Admin | CRUD de clientes |
-| GET / POST | `/api/employees` | Admin | Lista y crea empleados |
-| GET / PUT / DELETE | `/api/employees/:id` | Admin | CRUD de empleados |
-| GET / POST | `/api/orders` | Autenticado | Lista y crea pedidos |
-| GET / PUT / DELETE | `/api/orders/:id` | Admin | Gestión de pedidos |
-| GET | `/api/dashboard` | Admin | Métricas consolidadas del panel |
-
----
-
-## Instrucciones de Ejecución
-
-Necesitas tener **dos terminales** abiertas simultáneamente.
-
-### Terminal 1 — Backend
-
-1. Navega a la carpeta del backend:
-   ```bash
-   cd backend
-   ```
-2. Crea el archivo `.env` con las variables necesarias (ver sección de Variables de Entorno).
-3. Instala las dependencias (solo la primera vez):
-   ```bash
-   npm install
-   ```
-4. Levanta el servidor:
-   ```bash
-   node app.js
-   ```
-   Deberías ver: `Server running on port 5000` y `MongoDB Connected: ...`
-
-### Terminal 2 — Frontend
-
-1. Navega a la carpeta del frontend:
-   ```bash
-   cd frontend-private
-   ```
-2. Instala las dependencias (solo la primera vez):
-   ```bash
-   npm install
-   ```
-3. Levanta el servidor de desarrollo:
-   ```bash
-   npm run dev
-   ```
-4. Abre `http://localhost:5173/` (o `5174/`) en el navegador.
-
----
-
-## Variables de Entorno (`backend/.env`)
-
-```env
-DB_URI="mongodb+srv://USUARIO:CONTRASEÑA@cluster.mongodb.net/streetFlexDB?retryWrites=true&w=majority"
-JWT_secret_key="tu_clave_secreta_jwt"
-
-CLOUDINARY_CLOUD_NAME="tu_cloud_name"
-CLOUDINARY_API_KEY="tu_api_key"
-CLOUDINARY_API_SECRET="tu_api_secret"
-```
-
-> ⚠️ **Importante**: Asegúrate de agregar tu IP actual al Network Access de MongoDB Atlas para que la conexión funcione.
-
----
-
-## Primer Acceso como Administrador
-
-Para acceder al panel administrativo, debes:
-1. **Registrarte** en la app (`/register`).
-2. Ir a **MongoDB Atlas → Collections → Users** y cambiar el campo `role` de `customer` a `admin`.
-3. **Iniciar sesión** con ese correo y contraseña.
-
----
-
-## Aplicación Móvil
-
-El proyecto también tiene una app móvil (Expo + React Native) en `movil/`, que consume la misma API de `backendST/`. Ver [`movil/README.md`](movil/README.md) para el detalle de cómo correrla.
-
-## Equipo de Desarrollo
 - Carlos Mario
 - Andrés Emanuel
 - Marco Alejandro
 - Javier Eliezer
+
+**Docente:** Daniel Wilfredo Granados Hernández · **Módulo 5:** Desarrollo de componentes para dispositivos móviles.
+
+## Licencia
+
+Este proyecto se publica bajo la licencia **Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)**: se puede copiar, adaptar y compartir citando al equipo, sin fines comerciales y manteniendo la misma licencia. Texto completo en [`LICENSE`](LICENSE) y en <https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es>.
+
+---
+
+## Aplicación móvil (`movil/`)
+
+Cliente móvil de la tienda. Consume la API de `backendST/` con la función nativa `fetch`.
+
+### Funcionalidades
+
+- Inicio de sesión (la sesión se guarda y se restaura al abrir la app) y **registro** con verificación de correo por código de 6 dígitos.
+- **Edición del perfil** (nombre, usuario, teléfono y edad).
+- **Recuperación de contraseña** con un código que llega al correo.
+- **Catálogo** de productos con valoraciones, filtro por categoría (menú lateral con subcategorías) y búsqueda.
+- **Detalle del producto**: elegir talla y color, ver comentarios y valorar (solo si ya se compró).
+- **Carrito de compras** y compra con control de inventario (no deja comprar más de lo que hay).
+- **Historial de pedidos** con detalle, **cancelación** de pedidos pendientes (el stock vuelve a estar disponible) y favoritos.
+- Pantalla de carga (splash) personalizada y saludo con el nombre real del usuario en Home.
+
+### Dependencias instaladas
+
+Aplicación móvil (`movil/package.json`):
+
+| Paquete | Para qué |
+|---|---|
+| `expo` ~54, `react-native` 0.81, `react` 19 | Base del proyecto |
+| `@react-navigation/native`, `native-stack`, `bottom-tabs` | Navegación: pila de pantallas + menú de pestañas inferior |
+| `react-native-screens`, `react-native-safe-area-context` | Requeridas por la navegación |
+| `expo-secure-store` | Guardar la sesión (token) de forma segura |
+| `expo-image` | Mostrar las fotos de producto (WebP de Cloudinary) |
+| `expo-status-bar`, `expo-build-properties` | Barra de estado y propiedades de la compilación Android |
+| `lucide-react-native`, `react-native-svg`, `@expo/vector-icons` | Iconos |
+| `react-dom`, `react-native-web` | Solo para probar la app en el navegador (`npm run web`) |
+
+Backend (`backendST/package.json`): `express`, `mongoose`, `jsonwebtoken`, `bcryptjs`, `cors`, `cookie-parser`, `dotenv`, `nodemailer`, `multer` + `cloudinary`, `replicate`.
+
+### Configuración adicional
+
+1. **Backend con su `.env`**: copiar `backendST/.env.example` como `backendST/.env` y completar los valores (base de datos, `JWT_SECRET`, correo de Gmail con *contraseña de aplicación*, Cloudinary). El `.env` real **no se sube a GitHub**.
+2. **Dirección del backend en la app**: se define con la variable `EXPO_PUBLIC_API_URL` (ver `movil/.env.example`). Si no se define, el emulador de Android usa `http://10.0.2.2:4000/api`.
+3. **Android sin HTTPS**: `app.json` habilita `usesCleartextTraffic` (vía `expo-build-properties`) para poder probar contra una IP local. Con el backend desplegado con HTTPS no se usa.
+4. **Datos de prueba**: `node backendST/seedMovilDemo.js` (productos, categorías y banners) y `node backendST/seedMovilUsuarios.js` (clientes con pedidos y valoraciones).
+
+### Cómo correr todo en local
+
+```bash
+# Terminal 1 — backend (puerto 4000)
+cd backendST
+npm install
+npm run dev
+
+# Terminal 2 — app móvil
+cd movil
+npm install
+npm run android        # abre el emulador / dispositivo conectado
+```
+
+Cuentas de demostración (ya verificadas, con pedidos y valoraciones): `ana.demo@streetflex.test`, `luis.demo@streetflex.test`, `sofia.demo@streetflex.test`, todas con contraseña `Demo1234`.
+
+### Desplegar el backend (Render)
+
+El APK instalado en un celular necesita un backend con dirección pública. Pasos con [Render](https://render.com) (plan gratuito):
+
+1. En **MongoDB Atlas → Network Access**, permitir `0.0.0.0/0` (Render no tiene IP fija).
+2. **Correo por API (obligatorio en Render gratis).** Render bloquea el envío por SMTP (puertos 25/465/587) en el plan gratuito, así que el Gmail del `.env` no puede mandar los códigos de verificación y recuperación desde allí. Se usa [Brevo](https://www.brevo.com) (gratis, no pide dominio propio):
+   1. Crear la cuenta → **Senders, Domains & Dedicated IPs → Senders → Add a sender** con el mismo correo de `USER_EMAIL` y confirmarlo desde el correo que llega.
+   2. **SMTP & API → API Keys → Generate a new API key** y copiarla.
+3. En Render: **New → Blueprint**, elegir este repositorio. Render lee [`render.yaml`](render.yaml) y crea el servicio `streetflex-api`.
+4. Completar las variables que Render pide: `DB_URI`, `USER_EMAIL`, `BREVO_API_KEY` (la del paso 2), `CLOUDINARY_*`, `REPLICATE_API_TOKEN`, `FRONTEND_URL`. `JWT_SECRET` se genera solo. `USER_PASSWORD` (la contraseña de aplicación de Gmail) no hace falta en Render: solo se usa en local.
+5. Cuando termine, probar `https://TU-SERVICIO.onrender.com/api/health` (debe responder `{"ok":true}`).
+
+> El plan gratuito "duerme" el servidor tras 15 minutos sin uso; la primera petición tarda ~1 minuto. La app lo "despierta" mientras muestra la pantalla de carga.
+
+### Generar el APK
+
+Requisitos: Node, JDK 17 y el SDK de Android (el de Android Studio).
+
+```powershell
+cd movil
+powershell -ExecutionPolicy Bypass -File .\scripts\generar-apk.ps1 -ApiUrl "https://TU-SERVICIO.onrender.com/api"
+```
+
+Sale en `movil/apk/StreetFlex.apk`. Para compartirlo: subirlo a **GitHub → Releases** del repositorio o a Google Drive.
+
+**Descarga del APK:** _(pegar aquí el enlace)_
+
+### Estructura de carpetas de la app
+
+```
+movil/
+├── App.js                 # Solo arma los providers y el navegador
+├── app.json               # Nombre, iconos, splash, paquete Android
+├── scripts/generar-apk.ps1
+└── src/
+    ├── api/               # Una función por endpoint (fetch)
+    ├── components/        # Componentes reutilizables (ui/, product/)
+    ├── context/           # AuthContext (sesión) y CartContext (carrito)
+    ├── hooks/             # useAuth, useSplashTimer
+    ├── navigation/        # RootNavigator (pila) y TabMenu (pestañas)
+    ├── screens/           # Una pantalla por archivo (account/ para Mi cuenta)
+    ├── theme/             # Colores
+    └── utils/             # Validaciones, almacenamiento, formato
+```
+
+Convenciones: inglés y `camelCase` para variables y funciones; `PascalCase` para componentes (`ProductCard`, `TextField`...) y archivos de pantalla con sufijo `Screen`. Los campos que vienen de la API (`product_name`, `full_name`...) se dejan como los define el modelo.
+
+---
+
+## Backend y web
+
+- API: `cd backendST && npm install && npm run dev` (puerto 4000). Rutas en [`backendST/src/routes`](backendST/src/routes).
+- Web: `cd frontend && npm install && npm run dev` (puerto 5173, usa el proxy `/api`).
+- Para ser administrador hay que crear el usuario con `node backendST/createAdminScript.js`.

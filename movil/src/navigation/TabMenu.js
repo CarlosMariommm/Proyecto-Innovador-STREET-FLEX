@@ -55,11 +55,15 @@ const SavedTab = ({ navigation }) => (
   <SavedItemsScreen onOpenProduct={(productId) => navigation.navigate('ProductDetails', { productId })} />
 );
 
+const OrdersTab = ({ navigation }) => (
+  <OrderHistoryScreen onOpenOrder={(sale) => navigation.navigate('OrderDetail', { sale })} />
+);
+
 const TabMenu = () => (
   <Tab.Navigator tabBar={(props) => <TabBarWithGuard {...props} />} screenOptions={{ headerShown: false }}>
     <Tab.Screen name="home" component={HomeTab} />
     <Tab.Screen name="saved" component={SavedTab} />
-    <Tab.Screen name="orders" component={OrderHistoryScreen} />
+    <Tab.Screen name="orders" component={OrdersTab} />
     <Tab.Screen name="account" component={AccountInformationScreen} />
   </Tab.Navigator>
 );

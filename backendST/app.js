@@ -42,6 +42,14 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Detras del proxy de Render/Railway la IP y el https llegan en cabeceras.
+app.set('trust proxy', 1);
+
+// Para que la plataforma de despliegue (y la app movil, para "despertar" el
+// servidor gratuito antes de pedir datos) tengan algo barato que consultar.
+app.get('/', (req, res) => res.json({ ok: true, service: 'StreetFlex API' }));
+app.get('/api/health', (req, res) => res.json({ ok: true }));
+
 // Rutas
 app.use('/api/admins', adminRoutes);
 app.use('/api/employees', employeeRoutes);

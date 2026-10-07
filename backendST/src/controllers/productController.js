@@ -69,10 +69,18 @@ productController.addReview = async (req, res) => {
     const { id } = req.params; // Product ID
     const { id_client, rating, comment } = req.body;
 
-    // 1. Validar si el usuario compró el producto
+    const numericRating = Number(rating);
+    if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
+      return res.status(400).json({ message: "La valoración debe ser un número entero entre 1 y 5." });
+    }
+    if (comment && String(comment).length > 500) {
+      return res.status(400).json({ message: "El comentario no puede pasar de 500 caracteres." });
+    }
+
+    // 1. Validar si el usuario compró el producto (un pedido cancelado no cuenta)
     const clientCarts = await Shopping_Car.find({ id_client }).select('_id');
     const cartIds = clientCarts.map(c => c._id);
-    const sales = await Sale.find({ id_shoppig_car: { $in: cartIds } }).populate('id_shoppig_car');
+    const sales = await Sale.find({ id_shoppig_car: { $in: cartIds }, status: { $ne: 'Cancelado' } }).populate('id_shoppig_car');
     
     let hasPurchased = false;
     for (const sale of sales) {
@@ -103,8 +111,8 @@ productController.addReview = async (req, res) => {
     // Agregar review
     const review = {
       id_client,
-      rating: Number(rating),
-      comment
+      rating: numericRating,
+      comment: comment ? String(comment).trim() : comment
     };
     product.reviews.push(review);
 
