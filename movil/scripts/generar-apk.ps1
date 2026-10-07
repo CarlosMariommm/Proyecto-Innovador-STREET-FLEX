@@ -53,13 +53,12 @@ if ($LASTEXITCODE -ge 8) { throw "Fallo la copia del proyecto (robocopy codigo $
 
 Set-Location $CarpetaCorta
 
-if (-not (Test-Path (Join-Path $CarpetaCorta "node_modules"))) {
-  Write-Host "2/4 Instalando dependencias (npm ci)..."
-  npm ci --no-audit --no-fund
-  if ($LASTEXITCODE -ne 0) { throw "Fallo npm ci." }
-} else {
-  Write-Host "2/4 Dependencias ya instaladas en $CarpetaCorta."
-}
+# Siempre limpio (npm ci borra node_modules y instala EXACTO lo del package-lock):
+# reutilizar uno viejo ya dejo una app que se cerraba al abrir por mezclar dos
+# versiones de expo-font.
+Write-Host "2/4 Instalando dependencias exactas del package-lock (npm ci)..."
+npm ci --no-audit --no-fund
+if ($LASTEXITCODE -ne 0) { throw "Fallo npm ci." }
 
 Write-Host "3/4 Generando el proyecto nativo y compilando el APK (la primera vez tarda varios minutos)..."
 npx expo prebuild --platform android --no-install

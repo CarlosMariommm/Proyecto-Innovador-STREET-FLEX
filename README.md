@@ -92,6 +92,17 @@ El APK instalado en un celular necesita un backend con dirección pública. Paso
 4. Completar las variables que Render pide: `DB_URI`, `USER_EMAIL`, `BREVO_API_KEY` (la del paso 2), `CLOUDINARY_*`, `REPLICATE_API_TOKEN`, `FRONTEND_URL`. `JWT_SECRET` se genera solo. `USER_PASSWORD` (la contraseña de aplicación de Gmail) no hace falta en Render: solo se usa en local.
 5. Cuando termine, probar `https://TU-SERVICIO.onrender.com/api/health` (debe responder `{"ok":true}`).
 
+**Si el servicio se crea a mano (New → Web Service) y no con el Blueprint**, hay que configurarlo así en **Settings**, porque el código del backend no está en la raíz del repositorio sino en `backendST/`:
+
+| Campo | Valor |
+|---|---|
+| Root Directory | `backendST` |
+| Build Command | `npm install` |
+| Start Command | `npm start` |
+| Health Check Path | `/api/health` |
+
+Sin el *Root Directory* el despliegue falla con `ENOENT ... /opt/render/project/src/package.json`, porque Render busca el `package.json` en la raíz. La versión de Node se toma de `engines` (`22.x`). En **Environment** se agregan las variables del paso 4, más `NODE_ENV=production` y un `JWT_SECRET` largo y al azar.
+
 > El plan gratuito "duerme" el servidor tras 15 minutos sin uso; la primera petición tarda ~1 minuto. La app lo "despierta" mientras muestra la pantalla de carga.
 
 ### Generar el APK
