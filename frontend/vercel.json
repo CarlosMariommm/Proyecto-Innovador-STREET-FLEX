@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://TU-SERVICIO.onrender.com/api/:path*"
+      "destination": "https://proyecto-innovador-street-flex-1.onrender.com/api/:path*"
     },
     {
       "source": "/(.*)",
